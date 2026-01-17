@@ -5,6 +5,7 @@
 
 ## Availability
 - Monday–Friday: 6:00 PM – 9:00 PM (Central)
+- Preferred communication: Email
 
 ## Engineering principle
 - All changes go through small pull requests with review
