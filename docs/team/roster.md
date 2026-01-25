@@ -4,10 +4,9 @@
 Group-7
 
 ## Members + roles (roles are subject to change)
-- Grey — DevOps / QA
-- Victor Hugee-James — Project Manager / Scrum Lead (or Product Owner)
-- David Jimoh — Backend / API Lead
-- Ridhwaan — Frontend / UI Lead
+- Victor Grey — DevOps / QA
+- David Hugee-James — Project Manager / Scrum Lead / Documentation Lead
+- Ridhwaan Jimoh — Backend / API Lead / Frontend
 
 ## Communication
 - Primary channel: Email (or WhatApp / GroupMe / Teams / Slack) + (optional) GitHub Issues for tasks
