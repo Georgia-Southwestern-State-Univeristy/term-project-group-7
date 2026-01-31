@@ -6,7 +6,7 @@ U.S. middle school students consistently underperform in mathematics, science, a
 
 The primary target users of this system are **students in grades 6–8** who require additional academic reinforcement outside of traditional classroom instruction. Secondary users include **teachers and school administrators**, who need visibility into student progress and learning trends in order to better support instruction.
 
----
+
 
 ## Core Value Proposition
 
