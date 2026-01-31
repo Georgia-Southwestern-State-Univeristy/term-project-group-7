@@ -1,7 +1,6 @@
 # Project Direction & Scope Boundary
 
 ## Problem Statement & Target Users
-
 U.S. middle school students consistently underperform in mathematics, science, and reading compared to students in other developed nations. National assessment data shows a measurable decline in academic performance between 2020 and 2022, highlighting gaps in foundational understanding that negatively impact future educational outcomes.
 
 The primary target users of this system are **students in grades 6–8** who require additional academic reinforcement outside of traditional classroom instruction. Secondary users include **teachers and school administrators**, who need visibility into student progress and learning trends in order to better support instruction.
@@ -9,7 +8,6 @@ The primary target users of this system are **students in grades 6–8** who req
 
 
 ## Core Value Proposition
-
 This project delivers **personalized, data-driven supplemental learning** that reinforces key middle school concepts through spaced repetition and immediate feedback, while providing educators with actionable insight into student performance.
 
 Unlike static educational resources or traditional learning platforms, this system focuses on:
@@ -18,8 +16,6 @@ Unlike static educational resources or traditional learning platforms, this syst
 - Clear progress visualization for both students and educators
 
 The system is designed to **support classroom instruction**, not replace educators or existing curricula.
-
----
 
 ## Must-Have Features for Prototype (Semester Scope)
 
@@ -41,12 +37,8 @@ The following features define the **minimum viable prototype** required for succ
 - Instruction limited to a **subset of content from one grade level**
 - Clear separation of student and teacher access rights
 
----
-
 ## Explicit Non-Goals (Out of Scope)
-
 The following items are explicitly excluded from this project:
-
 - Replacing existing school curricula or standardized assessment systems
 - Full curriculum coverage for grades 6–8
 - Support for students enrolled in Individualized Education Programs (IEPs)
@@ -55,19 +47,13 @@ The following items are explicitly excluded from this project:
 - Parent-facing accounts or features
 - Mobile application development
 
----
-
 ## Scope Boundaries
-
 To prevent scope creep and ensure feasibility, the project is constrained as follows:
-
 - **Subjects:** Only one subject area will be fully prototyped
 - **Curriculum Depth:** Limited to select concepts, not an entire course
 - **Users:** Limited test users or simulated data only
 - **Platform:** Web-based prototype
 - **Content Management:** Instructor-created content only; no community sharing or marketplace features
-
----
 
 ## Risks
 
@@ -83,8 +69,5 @@ To prevent scope creep and ensure feasibility, the project is constrained as fol
 
 Mitigation strategies include strict feature prioritization, incremental development, and early validation of core functionality.
 
----
-
 ## Summary
-
 This project delivers a **focused and feasible educational software prototype** that demonstrates how personalized learning paths and performance visibility can enhance middle school education. Scope is intentionally limited to ensure a complete, functional system can be delivered and evaluated within the semester.
