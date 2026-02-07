@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Thin Vertical Slice - Hello Path</title>
+  </head>
+  <body>
+    <h1>Thin Vertical Slice: Hello Path</h1>
+    <p>This page calls <code>/api/health</code> and shows the result.</p>
+    <button id="btn">Call API</button>
+    <pre id="out">Click "Call API"…</pre>
+
+    <script>
+      const btn = document.getElementById("btn");
+      const out = document.getElementById("out");
+
+      btn.addEventListener("click", async () => {
+        out.textContent = "Loading...";
+        const res = await fetch("/api/health");
+        const data = await res.json();
+        out.textContent = JSON.stringify(data, null, 2);
+      });
+    </script>
+  </body>
+</html>
