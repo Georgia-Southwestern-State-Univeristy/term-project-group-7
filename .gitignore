@@ -1,0 +1,23 @@
+@"
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+
+# Local runtime artifacts
+*.db
+
+# Editor / OS
+.vscode/
+.DS_Store
+"@ | Out-File -Encoding utf8 .gitignore
