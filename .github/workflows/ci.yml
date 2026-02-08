@@ -3,21 +3,38 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   build-test:
-    runs-on: windows-latest
-
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure (CMake)
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ clang-format
+
+      # Check 1: Format (real signal)
+      - name: clang-format check
+        run: |
+          files="$(git ls-files 'src/*.cpp' 'tests/*.cpp' 'include/*.h' 'include/*.hpp' | tr '\n' ' ')"
+          # Don't format vendored third-party header
+          files="${files//include\/httplib.h/}"
+          clang-format --version
+          clang-format --dry-run --Werror $files
+
+      # Check 2: Build + Test (real signal)
+      - name: Configure
         run: cmake -S . -B build
 
-      - name: Build (Debug)
-        run: cmake --build build --config Debug
+      - name: Build
+        run: cmake --build build -j 2
 
-      - name: Test (ctest)
-        run: ctest --test-dir build -C Debug --output-on-failure
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Format check (clang-format)
+        run: clang-format --dry-run --Werror src/server.cpp tests/test_health.cpp
