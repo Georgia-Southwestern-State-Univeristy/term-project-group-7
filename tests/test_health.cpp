@@ -1,5 +1,5 @@
-#include <httplib.h>
 #include <chrono>
+#include <httplib.h>
 #include <iostream>
 #include <thread>
 
@@ -9,7 +9,7 @@ int main() {
   httplib::Server svr;
 
   // Self-contained health endpoint
-  svr.Get("/api/health", [](const httplib::Request&, httplib::Response& res) {
+  svr.Get("/api/health", [](const httplib::Request &, httplib::Response &res) {
     res.set_content(R"({"status":"ok"})", "application/json");
     res.status = 200;
   });
@@ -26,7 +26,8 @@ int main() {
 
   // Stop server
   svr.stop();
-  if (t.joinable()) t.join();
+  if (t.joinable())
+    t.join();
 
   if (!resp) {
     std::cerr << "FAIL: No response from /api/health\n";

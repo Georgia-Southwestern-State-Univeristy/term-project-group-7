@@ -3,7 +3,7 @@
 
 #include "httplib.h"
 
-static const char* INDEX_HTML = R"HTML(
+static const char *INDEX_HTML = R"HTML(
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,11 +20,11 @@ static const char* INDEX_HTML = R"HTML(
 int main() {
   httplib::Server server;
 
-  server.Get("/", [](const httplib::Request&, httplib::Response& res) {
+  server.Get("/", [](const httplib::Request &, httplib::Response &res) {
     res.set_content(INDEX_HTML, "text/html; charset=utf-8");
   });
 
-  server.Get("/api/health", [](const httplib::Request&, httplib::Response& res) {
+  server.Get("/api/health", [](const httplib::Request &, httplib::Response &res) {
     res.set_content(R"({"status":"ok","service":"cpp"})", "application/json; charset=utf-8");
   });
 
