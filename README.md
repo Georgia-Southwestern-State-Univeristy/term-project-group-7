@@ -4,38 +4,46 @@
 This project demonstrates a minimal end-to-end **thin vertical slice** that proves the system runs.
 The goal is execution and workflow discipline, not feature completeness.
 
-The application serves a simple web page (`/`) and exposes a backend health endpoint (`/api/health`) to confirm the system is functioning end-to-end.
+The application serves a simple web page and exposes a backend health endpoint to confirm the system is functioning end-to-end.
+
+- Web page: `GET /`
+- Health endpoint: `GET /api/health` → returns HTTP 200
 
 ---
 
 ## Tech Stack
-- **C++17**
-- **CMake**
-- **cpp-httplib** (single-header HTTP server/client)
-- **CTest** (automated tests)
-- **GitHub Actions (CI)**
+- C++17
+- CMake (build system)
+- CTest (tests)
+- cpp-httplib (single-header HTTP server/client)
+- clang-format (formatting)
+- GitHub Actions (CI)
 
 ---
 
-## Project Layout
-- `src/server.cpp` — C++ HTTP server (serves `/` and `/api/health`)
-- `static/` — static assets (if used by the server)
-- `tests/test_health.cpp` — C++ test (self-contained health check)
-- `CMakeLists.txt` — build + test configuration
-- `.clang-format` — formatting rules
-- `.github/workflows/ci.yml` — CI pipeline (format check + build + test)
+## Prerequisites
 
----
-
-## Prerequisites (Windows)
+### Windows (recommended for this repo)
 Install:
-- **Visual Studio 2022+** with **Desktop development with C++**
-- **Developer PowerShell for Visual Studio** (installed with Visual Studio)
-- **CMake**
-- **clang-format** (typically included with Visual Studio/LLVM tools)
+- Visual Studio 2022/2026 (or Build Tools) with **Desktop development with C++**
+- CMake
+- Git
 
-Verify in **Developer PowerShell for VS**:
+Use **Developer PowerShell for Visual Studio** (important).
+
+### macOS / Linux (optional)
+Install:
+- A C++ compiler (clang or g++)
+- CMake
+- Git
+- clang-format
+
+---
+
+## Build (from repo root)
+
+> IMPORTANT: On Windows, run these commands in **Developer PowerShell for Visual Studio**.
+
 ```powershell
-cmake --version
-where.exe clang-format
-clang-format --version
+cmake -S . -B build
+cmake --build build --config Debug
