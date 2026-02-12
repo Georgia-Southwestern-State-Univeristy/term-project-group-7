@@ -1,0 +1,21 @@
+# Build output
+build/
+out/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+*.vcxproj*
+*.sln
+*.user
+
+# Visual Studio
+.vs/
+
+# Binaries
+*.exe
+*.pdb
+*.ilk
+
+# OS/editor
+.DS_Store
+.vscode/
