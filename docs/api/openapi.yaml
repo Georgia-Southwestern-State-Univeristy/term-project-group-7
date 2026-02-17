@@ -1,0 +1,182 @@
+openapi: 3.0.3
+info:
+  title: Term Project Group 7 - MVP API
+  version: 0.1.0
+servers:
+  - url: http://127.0.0.1:5000
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+
+    StudentCreateRequest:
+      type: object
+      properties:
+        name: { type: string, example: "Alex" }
+        gradeLevel: { type: integer, example: 7 }
+      required: [name, gradeLevel]
+
+    StudentCreateResponse:
+      type: object
+      properties:
+        studentId: { type: string, example: "stu_12345" }
+        name: { type: string, example: "Alex" }
+        gradeLevel: { type: integer, example: 7 }
+      required: [studentId, name, gradeLevel]
+
+    AssessmentCreateRequest:
+      type: object
+      properties:
+        skill: { type: string, example: "fractions" }
+        score: { type: integer, example: 55 }
+      required: [skill, score]
+
+    AssessmentCreateResponse:
+      type: object
+      properties:
+        assessmentId: { type: string, example: "asm_987" }
+        studentId: { type: string, example: "stu_12345" }
+        skill: { type: string, example: "fractions" }
+        score: { type: integer, example: 55 }
+      required: [assessmentId, studentId, skill, score]
+
+    Recommendation:
+      type: object
+      properties:
+        recommendationId: { type: string, example: "rec_555" }
+        studentId: { type: string, example: "stu_12345" }
+        activityId: { type: string, example: "fractions-1" }
+        reason: { type: string, example: "Score below threshold; practice foundational skill." }
+        source:
+          type: string
+          enum: [rules, override]
+          example: rules
+      required: [recommendationId, studentId, activityId, reason, source]
+
+    TeacherOverrideRequest:
+      type: object
+      properties:
+        activityId: { type: string, example: "fractions-2" }
+        reason: { type: string, example: "Needs more practice before quiz." }
+      required: [activityId, reason]
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /api/health:
+    get:
+      summary: Health check
+      security: []   # no auth for health
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              example: { status: "ok" }
+
+  /api/students:
+    post:
+      summary: Create a student
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/StudentCreateRequest" }
+            example: { name: "Alex", gradeLevel: 7 }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StudentCreateResponse" }
+              example: { studentId: "stu_12345", name: "Alex", gradeLevel: 7 }
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /api/students/{studentId}/assessments:
+    post:
+      summary: Submit an assessment for a student (generates recommendation)
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AssessmentCreateRequest" }
+            example: { skill: "fractions", score: 55 }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AssessmentCreateResponse" }
+              example: { assessmentId: "asm_987", studentId: "stu_12345", skill: "fractions", score: 55 }
+        "404":
+          description: Student not found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /api/students/{studentId}/recommendations/latest:
+    get:
+      summary: Get the latest recommendation for a student
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Recommendation" }
+        "404":
+          description: Student or recommendation not found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /api/students/{studentId}/teacher-override:
+    post:
+      summary: Override the latest recommendation
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TeacherOverrideRequest" }
+            example: { activityId: "fractions-2", reason: "Needs more practice before quiz." }
+      responses:
+        "200":
+          description: Override applied
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Recommendation" }
+        "404":
+          description: Student not found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
