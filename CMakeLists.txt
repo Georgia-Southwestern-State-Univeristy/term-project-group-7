@@ -41,3 +41,17 @@ if (WIN32)
 endif()
 
 add_test(NAME health COMMAND test_health)
+
+# --- MVP behavior test added ---
+add_executable(test_mvp_service tests/test_mvp_service.cpp)
+
+target_include_directories(test_mvp_service PRIVATE
+  ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_SOURCE_DIR}/src
+)
+
+if (WIN32)
+  target_link_libraries(test_mvp_service PRIVATE ws2_32)
+endif()
+
+add_test(NAME mvp_service COMMAND test_mvp_service)

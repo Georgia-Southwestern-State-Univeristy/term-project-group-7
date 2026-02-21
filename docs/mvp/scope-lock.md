@@ -21,13 +21,13 @@
 
 **No full curriculum:** The MVP will be limited to basic mathematical operations (i.e. addition, subtraction, multiplication, and division). 
 
-**GUI:** The GUI will be text based only and receive keyboard and mouse inputs. The GUI will not display any graphical elements or images.
+**No UI:** The MVP has no GUI/web frontend. All interaction is via HTTP endpoints (curl/browser).
 
 **Advanced Analytics:** The MVP will use simple analysis to determine the student's performance (i.e. correct answers vs. incorrect answers, scores on individual topics, and cumulative score). The MVP will not determine statistical trends or class averages.
 
 **Authentication:** The MVP will not include full user authentication. User logins, user accounts, passwords, and security verification are out of scope.
 
-**Database access:** The MVP will have persistent data storage. Analytics, users progress, and scores will all be reset once the application closes.
+**No database persistence:** The MVP uses in-memory storage only. Data resets when the server restarts.
 
 **AI/ML:** The MVP will not use AI/ML for analytics or recommend a learning path.
 
@@ -42,34 +42,28 @@
 
 **Introduction**
 1. Navigate to the local project directory.
-2. Launch the application from the project's build directory.
-3. Display the applications main menu with the following math topics: addition, subtraction, multiplication, and division.
+2. Build and run the server.
+3. Confirm the server is running at `http://127.0.0.1:5000`.
 
-**Math Topic 1: Addition**
-1. Select the "Addition" topic from the main menu.
-2. Demonstrate the functionality by solving two questions correctly.
-3. Solve the third question incorrectly (The application displays feedback.)
-4. Exit the "Addition" topic and return to the main menu.
+**Step 1: Health check**
+- Request: `GET /api/health`
+- Proof: returns JSON with `"status":"ok"` and HTTP 200.
 
-**Math Topic 2: Subtraction**
-1. Select the "Subtraction" topic from the main menu.
-2. Demonstrate the functionality by solving one question correctly.
-3. Solve the second question incorrectly (The application displays feedback.)
-4. Exit the "Subtraction" topic and return to the main menu.
+**Step 2: Create a student**
+- Request: `POST /api/students`
+- Body: `{ "name": "Alex", "gradeLevel": 7 }`
+- Proof: returns a `studentId` and HTTP 201.
 
-**Math Topic 3: Multiplication**
-1. Select the "Multiplication" topic from the main menu.
-2. Demonstrate the functionality by solving two questions correctly.
-3. Solve the second question incorrectly (The application displays feedback.)
-4. Exit the "Multiplication" topic and return to the main menu.
+**Step 3: Add an assessment**
+- Request: `POST /api/students/{studentId}/assessments`
+- Body: `{ "skill": "fractions", "score": 62 }`
+- Proof: returns an assessment object and HTTP 201.
 
-**Math Topic 4: Division**
-1. Select the "Division" topic from the main menu.
-2. Demonstrate the functionality by solving two questions correctly.
-3. Solve the second question incorrectly (The application displays feedback.)
-4. Exit the "Division" topic and return to the main menu.
+**Step 4: View latest recommendation**
+- Request: `GET /api/students/{studentId}/recommendations/latest`
+- Proof: returns a recommendation with `source: "rules"` and HTTP 200.
 
-**Student Score**
-1. Navigate to the "Analytics" button on the main menu.
-2. The Analytics page displays the students scores in the individual topics and the cumulative score.
-      3. Exit the "Analytics" page and return to the main menu.
+**Step 5: Teacher override (optional but supported by contract)**
+- Request: `POST /api/students/{studentId}/teacher-override`
+- Body: `{ "activityId": "fractions_practice_set_A", "reason": "Teacher override for targeted practice." }`
+- Proof: `GET /recommendations/latest` now returns `source: "override"`.

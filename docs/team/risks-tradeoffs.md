@@ -23,3 +23,13 @@
 
 - **Risk: Poor content tagging or mapping reduces recommendation effectiveness**  
   Require explicit grade, topic, and skill tags for all content and allow teacher feedback or overrides.
+
+
+- **Risk: Contract and code drift (OpenAPI says one thing, server does another).**  
+  Treat `docs/api/openapi.yaml` as the source of truth; update contract + implementation in the same PR.
+
+- **Risk: CI signal too weak (build passes while behavior breaks).**  
+  Add at least one automated test validating MVP behavior and run it in CI using `ctest`.
+
+- **Risk: Demo not repeatable on teammate machines.**  
+  README must include exact build/run commands and exact curl requests (Hello Path).
