@@ -4,7 +4,7 @@
 This project demonstrates a minimal end-to-end **thin vertical slice** that proves the system runs.
 The goal is execution and workflow discipline, not feature completeness.
 
-The application serves a simple web page and exposes a backend health endpoint to confirm the system is functioning end-to-end.
+The application serves a simple web page and exposes backend endpoints to confirm the system is functioning end-to-end.
 
 - Web page: `GET /`
 - Health endpoint: `GET /api/health` → returns HTTP 200
