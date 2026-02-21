@@ -93,35 +93,35 @@ int main() {
     }
 
     res.status = 201;
-    res.set_content(
-        std::string("{\"studentId\":\"") + s->studentId + "\",\"name\":\"" + s->name +
-            "\",\"gradeLevel\":" + std::to_string(s->gradeLevel) + "}",
-        "application/json; charset=utf-8");
+    res.set_content(std::string("{\"studentId\":\"") + s->studentId + "\",\"name\":\"" + s->name +
+                        "\",\"gradeLevel\":" + std::to_string(s->gradeLevel) + "}",
+                    "application/json; charset=utf-8");
   });
 
-  server.Post(R"(/api/students/([A-Za-z0-9_]+)/assessments)", [&](const httplib::Request &req, httplib::Response &res) {
-    const std::string studentId = req.matches[1];
+  server.Post(R"(/api/students/([A-Za-z0-9_]+)/assessments)",
+              [&](const httplib::Request &req, httplib::Response &res) {
+                const std::string studentId = req.matches[1];
 
-    auto skill = json_get_string(req.body, "skill");
-    auto score = json_get_int(req.body, "score");
-    if (!skill.has_value() || !score.has_value()) {
-      return json_error(res, 400, "skill and score are required");
-    }
+                auto skill = json_get_string(req.body, "skill");
+                auto score = json_get_int(req.body, "score");
+                if (!skill.has_value() || !score.has_value()) {
+                  return json_error(res, 400, "skill and score are required");
+                }
 
-    std::string err;
-    auto a = svc.add_assessment_and_recommend(studentId, *skill, *score, err);
-    if (!a.has_value()) {
-      if (err == "student not found")
-        return json_error(res, 404, err);
-      return json_error(res, 400, err);
-    }
+                std::string err;
+                auto a = svc.add_assessment_and_recommend(studentId, *skill, *score, err);
+                if (!a.has_value()) {
+                  if (err == "student not found")
+                    return json_error(res, 404, err);
+                  return json_error(res, 400, err);
+                }
 
-    res.status = 201;
-    res.set_content(
-        std::string("{\"assessmentId\":\"") + a->assessmentId + "\",\"studentId\":\"" + a->studentId +
-            "\",\"skill\":\"" + a->skill + "\",\"score\":" + std::to_string(a->score) + "}",
-        "application/json; charset=utf-8");
-  });
+                res.status = 201;
+                res.set_content(std::string("{\"assessmentId\":\"") + a->assessmentId +
+                                    "\",\"studentId\":\"" + a->studentId + "\",\"skill\":\"" +
+                                    a->skill + "\",\"score\":" + std::to_string(a->score) + "}",
+                                "application/json; charset=utf-8");
+              });
 
   server.Get(R"(/api/students/([A-Za-z0-9_]+)/recommendations/latest)",
              [&](const httplib::Request &req, httplib::Response &res) {
@@ -134,35 +134,36 @@ int main() {
                }
 
                res.status = 200;
-               res.set_content(
-                   std::string("{\"recommendationId\":\"") + rec->recommendationId + "\",\"studentId\":\"" +
-                       rec->studentId + "\",\"activityId\":\"" + rec->activityId + "\",\"reason\":\"" + rec->reason +
-                       "\",\"source\":\"" + rec->source + "\"}",
-                   "application/json; charset=utf-8");
+               res.set_content(std::string("{\"recommendationId\":\"") + rec->recommendationId +
+                                   "\",\"studentId\":\"" + rec->studentId + "\",\"activityId\":\"" +
+                                   rec->activityId + "\",\"reason\":\"" + rec->reason +
+                                   "\",\"source\":\"" + rec->source + "\"}",
+                               "application/json; charset=utf-8");
              });
 
-  server.Post(R"(/api/students/([A-Za-z0-9_]+)/teacher-override)", [&](const httplib::Request &req, httplib::Response &res) {
-    const std::string studentId = req.matches[1];
+  server.Post(R"(/api/students/([A-Za-z0-9_]+)/teacher-override)",
+              [&](const httplib::Request &req, httplib::Response &res) {
+                const std::string studentId = req.matches[1];
 
-    auto activityId = json_get_string(req.body, "activityId");
-    auto reason = json_get_string(req.body, "reason");
-    if (!activityId.has_value() || !reason.has_value()) {
-      return json_error(res, 400, "activityId and reason are required");
-    }
+                auto activityId = json_get_string(req.body, "activityId");
+                auto reason = json_get_string(req.body, "reason");
+                if (!activityId.has_value() || !reason.has_value()) {
+                  return json_error(res, 400, "activityId and reason are required");
+                }
 
-    std::string err;
-    auto rec = svc.teacher_override(studentId, *activityId, *reason, err);
-    if (!rec.has_value()) {
-      return json_error(res, 404, err);
-    }
+                std::string err;
+                auto rec = svc.teacher_override(studentId, *activityId, *reason, err);
+                if (!rec.has_value()) {
+                  return json_error(res, 404, err);
+                }
 
-    res.status = 200;
-    res.set_content(
-        std::string("{\"recommendationId\":\"") + rec->recommendationId + "\",\"studentId\":\"" + rec->studentId +
-            "\",\"activityId\":\"" + rec->activityId + "\",\"reason\":\"" + rec->reason + "\",\"source\":\"" +
-            rec->source + "\"}",
-        "application/json; charset=utf-8");
-  });
+                res.status = 200;
+                res.set_content(std::string("{\"recommendationId\":\"") + rec->recommendationId +
+                                    "\",\"studentId\":\"" + rec->studentId +
+                                    "\",\"activityId\":\"" + rec->activityId + "\",\"reason\":\"" +
+                                    rec->reason + "\",\"source\":\"" + rec->source + "\"}",
+                                "application/json; charset=utf-8");
+              });
 
   std::cout << "Running on http://127.0.0.1:5000\n";
   server.listen("127.0.0.1", 5000);
