@@ -1,0 +1,25 @@
+erDiagram
+
+    STUDENT {
+        string studentId PK
+        string name
+        int gradeLevel
+    }
+
+    ASSESSMENT {
+        string assessmentId PK
+        string studentId FK
+        string skill
+        int score
+    }
+
+    RECOMMENDATION {
+        string recommendationId PK
+        string studentId FK
+        string activityId
+        string reason
+        string source
+    }
+
+    STUDENT ||--o{ ASSESSMENT : has
+    STUDENT ||--o{ RECOMMENDATION : receives
