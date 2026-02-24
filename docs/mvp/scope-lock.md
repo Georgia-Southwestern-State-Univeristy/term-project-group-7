@@ -1,3 +1,30 @@
+# Week 7 Status (MVP Progress Evidence)
+
+**Project Board (evidence):** <(https://github.com/orgs/Georgia-Southwestern-State-Univeristy/projects/24)>
+
+> Rule: “Done” means the story is merged to `main` with CI checks passing.
+
+## Story Status
+
+| MVP Story | Status | Evidence (PR link / Notes) |
+|---|---|---|
+| User Story 7: Health endpoint | Done | PR: <https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/20> |
+| User Story 6: Create student profile | Done | PR: <https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/20> |
+| User Story 3: Immediate feedback + recommendation | Done | PR: <https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/20> |
+| User Story 8: Automated tests for recommendation behavior | In Progress | PR: <https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/21> (open) |
+| User Story 5: Teacher views performance | Blocked | Blocked: out of MVP scope / not implemented this sprint |
+
+## Scope Changes
+No scope changes this week. We are keeping the Week 6 scope lock to focus on delivering fewer stories end-to-end with CI coverage.
+
+## Updated Demo Outline (what we can actually show right now)
+- Build + run server locally
+- `GET /api/health` returns 200
+- `POST /api/students` returns 201 + studentId
+- `POST /api/students/{studentId}/assessments` returns 201
+- `GET /api/students/{studentId}/recommendations/latest` returns 200 + `source:"rules"`
+- (Optional) `POST /api/students/{studentId}/teacher-override` then latest recommendation returns `source:"override"`
+
 # User Stories
 
 **User Story 1:** As a student, I want to solve math problems, so that I can perform better in my math class.
@@ -8,7 +35,7 @@
 
 **User Story 4:** As a student I want an explanation of the questions that I got wrong, so that I can improve my knowledge on the topics.
 
-**User Story 5:** As a teacher I want to view my studentâ€™s performance, so that I can provide additional resources to their weaknesses.
+**User Story 5:** As a teacher I want to view my student's performance, so that I can provide additional resources to their weaknesses.
 
 **User Story 6:** As a teacher, I want to create a student profile, so that I can track learning activity for a specific learner.
 
