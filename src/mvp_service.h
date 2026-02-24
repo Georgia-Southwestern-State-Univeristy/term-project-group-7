@@ -22,9 +22,8 @@ public:
   }
 
   std::optional<Assessment> add_assessment_and_recommend(const std::string &studentId,
-                                                        const std::string &skill,
-                                                        int score,
-                                                        std::string &err) {
+                                                         const std::string &skill, int score,
+                                                         std::string &err) {
     auto student = store_.get_student(studentId);
     if (!student.has_value()) {
       err = "student not found";
@@ -46,7 +45,8 @@ public:
     return a;
   }
 
-  std::optional<Recommendation> latest_recommendation(const std::string &studentId, std::string &err) {
+  std::optional<Recommendation> latest_recommendation(const std::string &studentId,
+                                                      std::string &err) {
     auto student = store_.get_student(studentId);
     if (!student.has_value()) {
       err = "student not found";
@@ -63,8 +63,7 @@ public:
 
   std::optional<Recommendation> teacher_override(const std::string &studentId,
                                                  const std::string &activityId,
-                                                 const std::string &reason,
-                                                 std::string &err) {
+                                                 const std::string &reason, std::string &err) {
     auto student = store_.get_student(studentId);
     if (!student.has_value()) {
       err = "student not found";
@@ -91,7 +90,8 @@ public:
   }
 
 private:
-  Recommendation make_rule_recommendation(const std::string &studentId, const std::string &skill, int score) {
+  Recommendation make_rule_recommendation(const std::string &studentId, const std::string &skill,
+                                          int score) {
     Recommendation rec;
     rec.recommendationId = "rec_rules";
     rec.studentId = studentId;
