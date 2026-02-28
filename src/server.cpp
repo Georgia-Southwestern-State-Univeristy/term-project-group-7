@@ -3,6 +3,7 @@
 #include <string>
 
 #include "httplib.h"
+#include "menu/menu.h"
 
 #include "in_memory_store.h"
 #include "mvp_service.h"
@@ -66,6 +67,8 @@ static void json_error(httplib::Response &res, int code, const std::string &msg)
 }
 
 int main() {
+  runMainMenu();
+
   httplib::Server server;
 
   InMemoryStore store;
@@ -166,6 +169,8 @@ int main() {
               });
 
   std::cout << "Running on http://127.0.0.1:5000\n";
+
+
   server.listen("127.0.0.1", 5000);
   return 0;
 }

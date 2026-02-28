@@ -7,10 +7,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # ---- server ----
 add_executable(server
     src/server.cpp
+    src/menu/menu.cpp
+    src/menu/addition_menu.cpp
+    src/problem/addition_problem.cpp
+    src/problem/addition_problem_generator.cpp
 )
 
 target_include_directories(server PRIVATE
     ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/src
 )
 
 # Windows sockets library (needed for cpp-httplib on Windows)
@@ -30,6 +35,10 @@ enable_testing()
 
 add_executable(test_health
   tests/test_health.cpp
+  tests/test_addition_problems.cpp
+  tests/test_addition_problem_generator.cpp
+  src/problem/addition_problem.cpp
+  src/problem/addition_problem_generator.cpp
 )
 
 target_include_directories(test_health PRIVATE

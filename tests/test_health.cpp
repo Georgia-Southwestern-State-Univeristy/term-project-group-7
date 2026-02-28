@@ -3,6 +3,9 @@
 #include <iostream>
 #include <thread>
 
+void testAdditionProblem();
+void testAdditionProblemGenerator();
+
 int main() {
   constexpr int kPort = 5000;
 
@@ -39,5 +42,9 @@ int main() {
   }
 
   std::cout << "PASS: /api/health OK\n";
+
+  testAdditionProblem();
+  testAdditionProblemGenerator();
+
   return 0;
 }
