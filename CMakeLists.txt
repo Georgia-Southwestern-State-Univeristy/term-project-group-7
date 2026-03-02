@@ -55,3 +55,45 @@ if (WIN32)
 endif()
 
 add_test(NAME mvp_service COMMAND test_mvp_service)
+
+# --- Week 7: additional demo-path tests (4 required) ---
+
+add_executable(test_happy_high_score_rules tests/test_happy_high_score_rules.cpp)
+target_include_directories(test_happy_high_score_rules PRIVATE
+  ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_SOURCE_DIR}/src
+)
+if (WIN32)
+  target_link_libraries(test_happy_high_score_rules PRIVATE ws2_32)
+endif()
+add_test(NAME happy_high_score_rules COMMAND test_happy_high_score_rules)
+
+add_executable(test_happy_grade_level_boundaries tests/test_happy_grade_level_boundaries.cpp)
+target_include_directories(test_happy_grade_level_boundaries PRIVATE
+  ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_SOURCE_DIR}/src
+)
+if (WIN32)
+  target_link_libraries(test_happy_grade_level_boundaries PRIVATE ws2_32)
+endif()
+add_test(NAME happy_grade_level_boundaries COMMAND test_happy_grade_level_boundaries)
+
+add_executable(test_failure_invalid_score tests/test_failure_invalid_score.cpp)
+target_include_directories(test_failure_invalid_score PRIVATE
+  ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_SOURCE_DIR}/src
+)
+if (WIN32)
+  target_link_libraries(test_failure_invalid_score PRIVATE ws2_32)
+endif()
+add_test(NAME failure_invalid_score COMMAND test_failure_invalid_score)
+
+add_executable(test_boundary_score_70_cutoff tests/test_boundary_score_70_cutoff.cpp)
+target_include_directories(test_boundary_score_70_cutoff PRIVATE
+  ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_SOURCE_DIR}/src
+)
+if (WIN32)
+  target_link_libraries(test_boundary_score_70_cutoff PRIVATE ws2_32)
+endif()
+add_test(NAME boundary_score_70_cutoff COMMAND test_boundary_score_70_cutoff)
