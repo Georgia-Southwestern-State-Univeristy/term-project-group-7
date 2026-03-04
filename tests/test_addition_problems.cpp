@@ -6,18 +6,18 @@
 
 /*
   Basic tests for the AdditionProblem class.
- 
+
   This test creates a simple addition problem and verifies:
    - The addends are stored correctly
    - The generated problem text matches expectations
    - The computed answer is correct
    - The difficulty string is preserved
- 
+
   These are straightforward sanity checks to make sure the
   constructor initializes everything properly.
  */
 void testAdditionProblem() {
-  //std::cout << "\n--- Running AdditionProblem tests ---\n";
+  // std::cout << "\n--- Running AdditionProblem tests ---\n";
 
   // Sample data for the test
   std::vector<double> numbers = {3, 5, 7};

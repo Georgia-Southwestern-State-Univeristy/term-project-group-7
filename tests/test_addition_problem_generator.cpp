@@ -7,18 +7,18 @@
 
 /*
   Basic tests for the AdditionProblemGenerator.
- 
+
   This test verifies that:
    - The correct number of problems is generated
    - Each problem contains a reasonable number of addends
    - The answer stored in each problem is accurate
    - The difficulty string is passed through correctly
- 
+
   Since the generator uses randomness, we don't check exact values —
   only structural correctness and internal consistency.
  */
 void testAdditionProblemGenerator() {
-  //std::cout << "\n--- Running AdditionProblemGenerator tests ---\n";
+  // std::cout << "\n--- Running AdditionProblemGenerator tests ---\n";
 
   AdditionProblemGenerator generator;
 

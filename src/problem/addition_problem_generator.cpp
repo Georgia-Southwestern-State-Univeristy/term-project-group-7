@@ -4,12 +4,12 @@
 /*
   This file generates several addition problems when invoked.
 
- 
+
   Each problem:
    - Contains between 2 and 4 addends
    - Uses integer values in the range [-100, 1000]
    - Stores the provided difficulty level
- 
+
   @param numProblems  Number of problems to generate
   @param difficulty   Difficulty label associated with each problem
 
@@ -19,7 +19,7 @@
     the steps. The problems being generated are representative of 6th grade addition
     problems with 7th and 8th being added in future versions when data persistence
     has been implemented.
- 
+
   @return A vector containing the generated AdditionProblem objects
  */
 std::vector<AdditionProblem>
@@ -27,8 +27,8 @@ AdditionProblemGenerator::generateProblems(int numProblems, const std::string &d
   std::vector<AdditionProblem> problems;
 
   // Random number engine setup
-  std::random_device randomDevice; //Initial random seed pulled from the OS.
-  std::mt19937 generator(randomDevice()); //True random number generator.
+  std::random_device randomDevice;        // Initial random seed pulled from the OS.
+  std::mt19937 generator(randomDevice()); // True random number generator.
 
   // Determines how many addends will be in each problem
   // Either 2, 3, or 4
@@ -39,9 +39,9 @@ AdditionProblemGenerator::generateProblems(int numProblems, const std::string &d
 
   for (int i = 0; i < numProblems; ++i) {
     int addendCount = addendsCountTotal(generator);
-    //predetermine vector size to prevent future resizing
+    // predetermine vector size to prevent future resizing
     std::vector<double> addends;
-    addends.reserve(addendCount); 
+    addends.reserve(addendCount);
 
     for (int j = 0; j < addendCount; ++j) {
       addends.push_back(valueDist(generator));

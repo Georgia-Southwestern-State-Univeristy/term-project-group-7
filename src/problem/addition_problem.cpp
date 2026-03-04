@@ -13,8 +13,8 @@
   Stores addends and difficulty, then builds
   the problem text and computes the answer.
  */
-AdditionProblem::AdditionProblem(const std::vector<double> &inputAddends, 
-    const std::string &inputDifficulty)
+AdditionProblem::AdditionProblem(const std::vector<double> &inputAddends,
+                                 const std::string &inputDifficulty)
     : addends(inputAddends), difficulty(inputDifficulty), answer(0.0) {
   computeAnswer();
   generateProblemText();

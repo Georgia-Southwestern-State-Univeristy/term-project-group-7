@@ -8,7 +8,7 @@
   This file offers the addition selection of the program. it presents
   users with a submenu of addition problem types such as integer,
   decimals, fractions, mixed operations, and back. The back option
-  returns the user to the main menu. 
+  returns the user to the main menu.
  */
 void displayAdditionMenuOptions() {
   std::cout << "\n---- ADDITION MENU ----\n";
@@ -21,7 +21,7 @@ void displayAdditionMenuOptions() {
 
 /*
   Runs the addition submenu loop.
- 
+
   The user can:
    - Select integer problems
    - Answer each question one at a time
@@ -36,7 +36,7 @@ void runAdditionMenu() {
     int selection;
     std::cin >> selection;
 
-    //Catches invalid input from the user.
+    // Catches invalid input from the user.
     if (!std::cin) {
       std::cin.clear();
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
