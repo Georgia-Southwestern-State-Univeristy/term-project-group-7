@@ -1,57 +1,52 @@
 #include "problem/subtraction_problem.h"
-#include "problem/subtraction_problem_generator.h"
 
 #include <cassert>
 #include <iostream>
 #include <vector>
 
 /*
-  Basic tests for the SubtractionProblemGenerator.
+  Basic tests for the SubtractionProblem class.
 
-  This test verifies that:
-   - The correct number of problems is generated
-   - Each problem contains a reasonable number of minuends
-   - The answer stored in each problem is accurate
-   - The difficulty string is passed through correctly
+  This test creates a simple subtraction problem and verifies:
+   - The minueds are stored correctly
+   - The generated problem text matches expectations
+   - The computed answer is correct
+   - The difficulty string is preserved
 
-  Since the generator uses randomness, we don't check exact values —
-  only structural correctness and internal consistency.
+  These are straightforward sanity checks to make sure the
+  constructor initializes everything properly.
  */
-void testSubtractionProblemGenerator() {
-  
-  SubtractionProblemGenerator generator;
+void testSubtractionProblem() {
 
-  const int requestedProblems = 5;
-  const std::string difficultyLevel = "6-8 grade";
+  // Sample data for the test
+  std::vector<double> numbers = {10, 17, -8};
+  std::string difficultyLevel = "6-8 grade";
 
-  // Generate a batch of problems
-  std::vector<SubtractionProblem> problems =
-      generator.generateProblems(requestedProblems, difficultyLevel);
+  // Construct the problem
+  SubtractionProblem problem(numbers, difficultyLevel);
 
-  // ---- Check number of problems generated ----
-  assert(problems.size() == requestedProblems);
+  // ---- Check minuends ----
+  assert(problem.minuends.size() == numbers.size());
 
-  // ---- Validate each generated problem ----
-  for (const auto &problem : problems) {
-
-    // Ensure addend count is within expected bounds (2–4)
-    assert(problem.minuends.size() >= 2);
-    assert(problem.minuends.size() <= 4);
-
-    // Verify the answer matches the difference of minuends
-    double computedDifference = problem.minuends[0];
-    for (size_t i = 1; i < problem.minuends.size(); ++i) {
-      computedDifference -= problem.minuends[i];
-    }
-
-    assert(problem.answer == computedDifference);
-
-    // Ensure difficulty was preserved
-    assert(problem.difficulty == difficultyLevel);
-
-    // Ensure problem text is not empty
-    assert(!problem.problemText.empty());
+  for (size_t i = 0; i < numbers.size(); ++i) {
+    assert(problem.minuends[i] == numbers[i]);
   }
 
-  std::cout << "PASS: /SubtractionProblemGenerator/health OK\n";
+  // ---- Check problem text formatting ----
+  // We expect something like "10 - 17 - -8"
+  std::string expectedText = "10 - 17 - -8";
+  assert(problem.problemText == expectedText);
+
+  // ---- Check computed answer ----
+  double calculatedDifference = problem.minuends[0];
+  for (size_t i = 1; i < problem.minuends.size(); ++i) {
+    calculatedDifference -= problem.minuends[i]; // manually compute difference for comparison
+  }
+
+  assert(problem.answer == calculatedDifference);
+
+  // ---- Check difficulty storage ----
+  assert(problem.difficulty == difficultyLevel);
+
+  std::cout << "PASS: /SubtractionProblem/health OK\n";
 }
