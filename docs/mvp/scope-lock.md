@@ -11,8 +11,8 @@
 | User Story 7: Health endpoint | Done | PR: <https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/20> |
 | User Story 6: Create student profile | Done | PR: <https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/20> |
 | User Story 3: Immediate feedback + recommendation | Done | PR: <https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/20> |
-| User Story 8: Automated tests for recommendation behavior | In Progress | PR: <https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/21> (open) |
-| User Story 5: Teacher views performance | Blocked | Blocked: out of MVP scope / not implemented this sprint |
+| User Story 8: Automated tests for recommendation behavior | Done | PR: <https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/21> (open) |
+| User Story 5: Teacher views performance | Not Done | Blocked: Out of MVP scope |
 
 ## Scope Changes
 No scope changes this week. We are keeping the Week 6 scope lock to focus on delivering fewer stories end-to-end with CI coverage.
