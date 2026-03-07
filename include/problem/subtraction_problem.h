@@ -9,7 +9,7 @@
 
   This class stores:
    - The minuends (2–4 numbers)
-   - A text version of the problem (e.g., "5 + 3 + 2")
+   - A text version of the problem (e.g., "10 - 3 - 5")
    - The computed answer
    - The difficulty label
 

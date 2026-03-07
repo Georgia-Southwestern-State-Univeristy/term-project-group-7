@@ -1,3 +1,10 @@
+/********************************************************
+ * @File: addition_problem.h
+ * Description:
+ * This header file provides the implementation for the
+ * addition problem functionality
+ ********************************************************/
+
 #pragma once
 
 #include <string>

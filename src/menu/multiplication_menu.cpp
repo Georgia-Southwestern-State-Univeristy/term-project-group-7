@@ -1,17 +1,17 @@
 #include <iostream>
 #include <limits>
 
-#include "menu/subtraction_menu.h"
-#include "problem/subtraction_problem_generator.h"
+#include "menu/multiplication_menu.h"
+#include "problem/multiplication_problem_generator.h"
 
 /*
-  This file offers the subtraction selection of the program. it presents
-  users with a submenu of subtraction problem types such as integer,
+  This file offers the multiplication selection of the program. it presents
+  users with a submenu of multiplication problem types such as integer,
   decimals, fractions, mixed operations, and back. The back option
   returns the user to the main menu.
  */
-void displaySubtractionMenuOptions() {
-  std::cout << "\n---- SUBTRACTION MENU ----\n";
+void displayMultiplicationMenuOptions() {
+  std::cout << "\n---- MULTIPLICATION MENU ----\n";
   std::cout << "1. Integers\n";
   std::cout << "2. Decimals\n";
   std::cout << "3. Fractions\n";
@@ -20,18 +20,18 @@ void displaySubtractionMenuOptions() {
 }
 
 /*
-  Runs the subtraction submenu loop.
+  Runs the multiplication submenu loop.
 
   The user can:
    - Select integer problems
    - Answer each question one at a time
    - Receive immediate feedback (correct, incorrect, score)
  */
-void runSubtractionMenu() {
+void runMultiplicationMenu() {
 
   while (true) {
 
-    displaySubtractionMenuOptions();
+    displayMultiplicationMenuOptions();
 
     int selection;
     std::cin >> selection;
@@ -52,10 +52,10 @@ void runSubtractionMenu() {
     case 1: {
       std::cout << "\nInteger quiz selected.\n";
 
-      SubtractionProblemGenerator generator;
+      MultiplicationProblemGenerator generator;
 
       // Hardcoded to 3 problems for now
-      std::vector<SubtractionProblem> problems = generator.generateProblems(3, "6-8 grade");
+      std::vector<MultiplicationProblem> problems = generator.generateProblems(3, "6-8 grade");
 
       int score = 0;
 

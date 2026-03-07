@@ -2,6 +2,8 @@
 #include <string>
 
 #include "menu/addition_menu.h"
+#include "menu/subtraction_menu.h"
+#include "menu/multiplication_menu.h"
 #include "menu/menu.h"
 
 /*
@@ -39,10 +41,10 @@ void runMainMenu() {
       runAdditionMenu();
       break;
     case 2:
-      std::cout << "\nMenu coming soon.\n";
+      runSubtractionMenu();
       break;
     case 3:
-      std::cout << "\nMenu coming soon.\n";
+      runMultiplicationMenu();
       break;
     case 4:
       std::cout << "\nMenu coming soon.\n";

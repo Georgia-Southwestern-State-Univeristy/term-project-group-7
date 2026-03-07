@@ -21,7 +21,7 @@ SubtractionProblem::SubtractionProblem(const std::vector<double> &inputMinuends,
 }
 
 /*
-  Computes the sum of all minuends.
+  Computes the difference of all minuends.
  */
 void SubtractionProblem::computeAnswer() {
   answer = minuends[0];

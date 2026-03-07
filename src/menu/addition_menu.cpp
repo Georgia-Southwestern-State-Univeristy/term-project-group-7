@@ -78,6 +78,7 @@ void runAdditionMenu() {
           score++;
         } else {
           std::cout << "Incorrect.\n";
+          std::cout << "The correct answer is: " << problems[i].answer << std::endl;
         }
       }
 
