@@ -5,6 +5,8 @@
 
 void testAdditionProblem();
 void testAdditionProblemGenerator();
+void testSubtractionProblem();
+void testSubtractionProblemGenerator();
 
 int main() {
   constexpr int kPort = 5000;
@@ -45,6 +47,8 @@ int main() {
 
   testAdditionProblem();
   testAdditionProblemGenerator();
+  testSubtractionProblem();
+  testSubtractionProblemGenerator();
 
   return 0;
 }

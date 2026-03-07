@@ -11,6 +11,9 @@ add_executable(server
     src/menu/addition_menu.cpp
     src/problem/addition_problem.cpp
     src/problem/addition_problem_generator.cpp
+    src/menu/subtraction_menu.cpp
+    src/problem/subtraction_problem.cpp
+    src/problem/subtraction_problem_generator.cpp
 )
 
 target_include_directories(server PRIVATE
@@ -39,6 +42,10 @@ add_executable(test_health
   tests/test_addition_problem_generator.cpp
   src/problem/addition_problem.cpp
   src/problem/addition_problem_generator.cpp
+  tests/test_subtraction_problems.cpp
+  tests/test_subtraction_problem_generator.cpp
+  src/problem/subtraction_problem.cpp
+  src/problem/subtraction_problem_generator.cpp
 )
 
 target_include_directories(test_health PRIVATE
