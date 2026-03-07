@@ -40,7 +40,4 @@ Automated tests verify:
 Tests run using CTest as part of the CI pipeline.
 
 ## CI Status
-The CI pipeline checks:
-- formatting
-- build success
-- passing automated tests
+The CI pipeline automatically verifies that the code is properly formatted, successfully builds the project, and runs the automated tests. These checks ensure that any new changes meet the project's quality standards before they are merged into the main branch.
