@@ -3,21 +3,6 @@
 #include <string>
 #include <vector>
 
-/*
-  @class SubtractionProblem
-  @brief Represents a single subtraction problem.
-
-  This class stores:
-   - The minuends (2–4 numbers)
-   - A text version of the problem (e.g., "10 - 3 - 5")
-   - The computed answer
-   - The difficulty label
-
-  The answer and problem text are generated
-  when the object is constructed.
-
-  future notes: this file needs to be expanded to include word problems.
- */
 class SubtractionProblem {
 public:
   std::vector<double> minuends; // A dynamic array containing the minuends.
