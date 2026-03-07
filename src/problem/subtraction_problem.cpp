@@ -1,37 +1,51 @@
-#pragma once
-
-#include <string>
-#include <vector>
+#include "problem/subtraction_problem.h"
+#include <sstream>
+/*
+  This is the implementation file for the subtraction_problem.h file.
+  This file is responsible for taking an array of numbers
+  and difficulty rating and creating an subtraction problem
+  object. It computes the answer and builds a string for
+  displaying the problem to the user.
+*/
 
 /*
-  @class SubtractionProblem
-  @brief Represents a single subtraction problem.
-
-  This class stores:
-   - The minuends (2–4 numbers)
-   - A text version of the problem (e.g., "10 - 3 - 5")
-   - The computed answer
-   - The difficulty label
-
-  The answer and problem text are generated
-  when the object is constructed.
-
-  future notes: this file needs to be expanded to include word problems.
+  Constructor
+  Stores minuends and difficulty, then builds
+  the problem text and computes the answer.
  */
-class SubtractionProblem {
-public:
-  std::vector<double> minuends; // A dynamic array containing the minuends.
-                                // Using a vector allows for the individual problem objects to
-                                // range between adding 2 to 4 values with ease.
+SubtractionProblem::SubtractionProblem(const std::vector<double> &inputMinuends,
+                                       const std::string &inputDifficulty)
+    : minuends(inputMinuends), difficulty(inputDifficulty), answer(0.0) {
+  computeAnswer();
+  generateProblemText();
+}
 
-  std::string problemText; // The subtraction problem converted to a string for display
-  double answer;           // The difference
-  std::string difficulty;  // The grade level 6th - 8th (Note: difficulty not implemented)
+/*
+  Computes the difference of all minuends.
+ */
+void SubtractionProblem::computeAnswer() {
+  answer = minuends[0];
 
-  // The SubtractionProblem constructor.
-  SubtractionProblem(const std::vector<double> &inputMinuends, const std::string &inputDifficulty);
+  for (size_t i = 1; i < minuends.size(); ++i) {
+    answer -= minuends[i];
+  }
+}
 
-private:
-  void generateProblemText();
-  void computeAnswer();
-};
+/*
+  Builds a readable string like:
+  "10 - 17 - -8"
+ */
+void SubtractionProblem::generateProblemText() {
+  std::ostringstream oss;
+
+  for (size_t i = 0; i < minuends.size(); ++i) {
+    oss << static_cast<int>(minuends[i]);
+
+    // Add "-" between numbers
+    if (i != minuends.size() - 1) {
+      oss << " - ";
+    }
+  }
+
+  problemText = oss.str();
+}
