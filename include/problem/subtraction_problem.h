@@ -35,3 +35,4 @@ private:
   void generateProblemText();
   void computeAnswer();
 };
+
