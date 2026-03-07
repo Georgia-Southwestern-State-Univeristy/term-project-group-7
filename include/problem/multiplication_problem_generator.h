@@ -14,5 +14,6 @@
  */
 class MultiplicationProblemGenerator {
 public:
-  std::vector<MultiplicationProblem> generateProblems(int numProblems, const std::string &difficulty);
+  std::vector<MultiplicationProblem> generateProblems(int numProblems,
+                                                      const std::string &difficulty);
 };

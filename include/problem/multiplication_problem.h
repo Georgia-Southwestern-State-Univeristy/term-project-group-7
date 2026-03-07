@@ -21,8 +21,8 @@
 class MultiplicationProblem {
 public:
   std::vector<double> multiplicand; // A dynamic array containing the minuends.
-                                // Using a vector allows for the individual problem objects to
-                                // range between adding 2 to 3 values with ease.
+                                    // Using a vector allows for the individual problem objects to
+                                    // range between adding 2 to 3 values with ease.
 
   std::string problemText; // The multiplication problem converted to a string for display
   double answer;           // The product

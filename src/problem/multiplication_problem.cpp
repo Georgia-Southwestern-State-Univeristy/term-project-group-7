@@ -14,7 +14,7 @@
   the problem text and computes the answer.
  */
 MultiplicationProblem::MultiplicationProblem(const std::vector<double> &inputMultiplicands,
-                                       const std::string &inputDifficulty)
+                                             const std::string &inputDifficulty)
     : multiplicand(inputMultiplicands), difficulty(inputDifficulty), answer(0.0) {
   computeAnswer();
   generateProblemText();

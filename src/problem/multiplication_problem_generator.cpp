@@ -39,8 +39,8 @@ MultiplicationProblemGenerator::generateProblems(int numProblems, const std::str
 
   for (int i = 0; i < 2; ++i) {
     int multiplicandCount = 2;
-    //multiplicandCountTotal(generator);
-    // predetermine vector size to prevent future resizing
+    // multiplicandCountTotal(generator);
+    //  predetermine vector size to prevent future resizing
     std::vector<double> multiplicand;
     multiplicand.reserve(multiplicandCount);
 

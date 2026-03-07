@@ -34,9 +34,8 @@ void testMultiplicationProblemGenerator() {
   // ---- Validate each generated problem ----
   for (const auto &problem : problems) {
 
-    // Ensure multiplicand count is equal to the expected 
+    // Ensure multiplicand count is equal to the expected
     assert(problem.multiplicand.size() == 2);
-    
 
     // Verify the answer matches the product of multiplicand
     double computedProduct = problem.multiplicand[0];

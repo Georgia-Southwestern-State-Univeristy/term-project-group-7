@@ -2,9 +2,9 @@
 #include <string>
 
 #include "menu/addition_menu.h"
-#include "menu/subtraction_menu.h"
-#include "menu/multiplication_menu.h"
 #include "menu/menu.h"
+#include "menu/multiplication_menu.h"
+#include "menu/subtraction_menu.h"
 
 /*
   This file is the menu system for the math program.
