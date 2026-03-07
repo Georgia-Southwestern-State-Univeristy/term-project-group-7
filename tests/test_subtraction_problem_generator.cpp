@@ -18,7 +18,7 @@
   only structural correctness and internal consistency.
  */
 void testSubtractionProblemGenerator() {
-  
+
   SubtractionProblemGenerator generator;
 
   const int requestedProblems = 5;

@@ -14,7 +14,7 @@
   the problem text and computes the answer.
  */
 SubtractionProblem::SubtractionProblem(const std::vector<double> &inputMinuends,
-                                 const std::string &inputDifficulty)
+                                       const std::string &inputDifficulty)
     : minuends(inputMinuends), difficulty(inputDifficulty), answer(0.0) {
   computeAnswer();
   generateProblemText();
