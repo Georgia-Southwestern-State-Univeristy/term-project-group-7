@@ -1,7 +1,7 @@
 # Midterm MVP Demo
 
 ## Video Link
-(Will be added after recording)
+File is too large to embed in this md file. The video will be saved to the MVP folder.
 
 ## Demo Goal
 Demonstrate that the MVP system runs end-to-end using the commands in the README.
