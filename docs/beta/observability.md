@@ -1,27 +1,49 @@
 # Observability Starter + Error Handling
 
 ## Where Logs Live
-Logs are currently written to the server console output while the application is running locally. Informational request logs should appear on standard output, and error logs should appear on standard error.
+Logs are written to the terminal where the C++ server is running:
+- successful request logs go to standard output
+- error logs go to standard error
 
 ## How to View Logs
-Run the server locally from the terminal using the project README instructions. While the server is running, make requests to the API endpoints and observe the log output in the same terminal session.
+1. Build and run the server locally
+2. Send requests to the API endpoints
+3. Observe log output in the same terminal session
 
 ## What Events Are Logged
-The application should log the following events:
-- health endpoint requests
-- student creation requests
-- assessment submission requests
-- latest recommendation requests
-- validation failures
-- student lookup failures
+The Beta starter logs the following:
+- `GET /api/health`
+- `POST /api/students`
+- `POST /api/students/{studentId}/assessments`
+- `GET /api/students/{studentId}/recommendations/latest`
+
+It also logs common failure cases:
+- missing required fields
+- invalid score validation failures
+- unknown `studentId` lookup failures
 
 ## How to Correlate a User Action to a Log Entry
-Each log entry should include the endpoint and action context. When available, the log should also include the `studentId` so a request can be connected to a specific learner action. This makes it easier to trace a request from the API call to the resulting response or failure.
+Each log entry includes:
+- `requestId`
+- endpoint
+- action
+- HTTP status
+- relevant request context such as `studentId`, score, or failure reason
+
+This allows a tester to match one API call to one log line and quickly identify what happened.
+
+## Example Failure Cases With Clear Error Messages
+
+### Case 1: Invalid score
+The API returns a clear validation error when `score` is outside `0..100`.
+
+### Case 2: Unknown student ID
+The API returns a clear not-found error when the provided `studentId` does not exist.
 
 ## Sample Log Snippet
 ```text
-[INFO] endpoint=/api/health status=200 action=health_check
-[INFO] endpoint=/api/students status=201 action=create_student studentId=student-1
-[INFO] endpoint=/api/students/{studentId}/assessments status=201 action=submit_assessment studentId=student-1
-[ERROR] endpoint=/api/students/{studentId}/assessments status=400 action=submit_assessment reason=invalid_score
-[ERROR] endpoint=/api/students/{studentId}/recommendations/latest status=404 action=get_latest_recommendation reason=student_not_found
+[INFO] requestId=req-1 endpoint=/api/health status=200 action=health_check
+[INFO] requestId=req-2 endpoint=/api/students status=201 action=create_student studentId=student_1 gradeLevel=7
+[INFO] requestId=req-3 endpoint=/api/students/{studentId}/assessments status=201 action=submit_assessment studentId=student_1 skill=fractions score=62
+[ERROR] requestId=req-4 endpoint=/api/students/{studentId}/assessments status=400 action=submit_assessment reason=validation_failed studentId=student_1 score=101
+[ERROR] requestId=req-5 endpoint=/api/students/{studentId}/recommendations/latest status=404 action=get_latest_recommendation reason=student_not_found studentId=missing_student

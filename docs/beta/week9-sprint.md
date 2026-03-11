@@ -1,51 +1,51 @@
 # Week 9 Sprint Goal + Committed Backlog
 
 ## Sprint Goal
-By Friday, users can complete the MVP workflow more reliably with clearer errors, better diagnostics, and regression protection.
+By Friday, users can complete the Beta MVP workflow more reliably through structured request logging, clearer error messages, and regression protection for common failures.
 
-## Committed Backlog Items
+## Committed Backlog Items (Ranked)
 
-### 1. Add request logging for key API actions
+### 1. Add structured logs for key API actions
 **Owner:** Grey
 
 **Acceptance Criteria:**
-- Log entries are written for `GET /api/health`
-- Log entries are written for `POST /api/students`
-- Log entries are written for `POST /api/students/{studentId}/assessments`
-- Log entries are written for `GET /api/students/{studentId}/recommendations/latest`
+- `GET /api/health` writes a structured log entry
+- `POST /api/students` writes a structured log entry
+- `POST /api/students/{studentId}/assessments` writes a structured log entry
+- `GET /api/students/{studentId}/recommendations/latest` writes a structured log entry
 
-### 2. Add structured error logs for common failures
+### 2. Improve error messages for common API failures
 **Owner:** Grey
 
 **Acceptance Criteria:**
-- Validation failures are logged with endpoint context
-- Student lookup failures are logged with endpoint context
-- Error logs include enough detail to understand what failed
+- Invalid score returns a clear validation message
+- Missing required fields return a clear validation message
+- Unknown `studentId` returns a clear not-found message
 
-### 3. Improve invalid input error messages
+### 3. Add structured error logs with useful context
 **Owner:** Grey
 
 **Acceptance Criteria:**
-- Invalid score returns a clear error message
-- Invalid or unknown student ID returns a clear error message
-- API responses explain what failed in a way that is easy to debug
+- Validation failures are logged with endpoint and reason
+- Student lookup failures are logged with endpoint, `studentId`, and reason
+- Error logs are distinct from successful request logs
 
-### 4. Add regression tests for fixed bugs
+### 4. Add regression tests for fixed Beta bugs
 **Owner:** Grey
 
 **Acceptance Criteria:**
-- At least 2 fixed bugs have matching automated tests
-- Tests run successfully in CI
-- The tests would fail again if the bug returned
+- At least 2 fixed bugs have automated regression tests
+- Regression tests run in CI
+- The tests would fail if the bug returned
 
-### 5. Document sprint evidence, bug triage, and observability
+### 5. Document sprint evidence and shipped work
 **Owner:** Grey
 
 **Acceptance Criteria:**
-- `docs/beta/week9-pr-index.md` exists
-- `docs/beta/bug-triage.md` exists
-- `docs/beta/observability.md` exists
-- Evidence links are added before submission
+- `docs/beta/week9-pr-index.md` is complete
+- `docs/beta/bug-triage.md` is complete
+- `docs/beta/observability.md` is complete
+- Project Board sprint link is added before submission
 
 ## Evidence
-Project Board Sprint View: (PROJECT LINK PENDING)
+**Project Board Sprint View:** https://github.com/orgs/Georgia-Southwestern-State-Univeristy/projects
