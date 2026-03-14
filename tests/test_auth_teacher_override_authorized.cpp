@@ -18,6 +18,7 @@ int main() {
     return fail("expected authorized role");
   }
 
-  std::cout << "PASS: authorized teacher override request would be allowed with valid token and role\n";
+  std::cout
+      << "PASS: authorized teacher override request would be allowed with valid token and role\n";
   return 0;
 }
