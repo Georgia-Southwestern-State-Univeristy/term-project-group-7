@@ -7,6 +7,7 @@
 
 #include "in_memory_store.h"
 #include "mvp_service.h"
+#include <cctype>
 
 static const char *INDEX_HTML = R"HTML(
 <!DOCTYPE html>
@@ -64,6 +65,37 @@ static std::optional<int> json_get_int(const std::string &body, const std::strin
 static void json_error(httplib::Response &res, int code, const std::string &msg) {
   res.status = code;
   res.set_content(std::string("{\"error\":\"") + msg + "\"}", "application/json; charset=utf-8");
+}
+
+static bool is_valid_activity_id(const std::string &activityId) {
+  if (activityId.empty())
+    return false;
+
+  for (char ch : activityId) {
+    if (!(std::isalnum(static_cast<unsigned char>(ch)) || ch == '_' || ch == '-')) {
+      return false;
+    }
+  }
+  return true;
+}
+
+static bool has_valid_auth_token(const httplib::Request &req) {
+  auto token = req.get_header_value("X-Auth-Token");
+  return token == "beta-teacher-token";
+}
+
+static std::optional<std::string> get_user_role(const httplib::Request &req) {
+  auto role = req.get_header_value("X-User-Role");
+  if (role.empty())
+    return std::nullopt;
+  return role;
+}
+
+static bool can_teacher_override(const httplib::Request &req) {
+  auto role = get_user_role(req);
+  if (!role.has_value())
+    return false;
+  return *role == "teacher" || *role == "admin";
 }
 
 int main() {
@@ -144,14 +176,35 @@ int main() {
                                "application/json; charset=utf-8");
              });
 
-  server.Post(R"(/api/students/([A-Za-z0-9_]+)/teacher-override)",
+    server.Post(R"(/api/students/([A-Za-z0-9_]+)/teacher-override)",
               [&](const httplib::Request &req, httplib::Response &res) {
                 const std::string studentId = req.matches[1];
 
+                if (!has_valid_auth_token(req)) {
+                  return json_error(res, 401, "missing or invalid auth token");
+                }
+
+                if (!can_teacher_override(req)) {
+                  return json_error(res, 403, "user role is not allowed to perform teacher override");
+                }
+
                 auto activityId = json_get_string(req.body, "activityId");
                 auto reason = json_get_string(req.body, "reason");
-                if (!activityId.has_value() || !reason.has_value()) {
-                  return json_error(res, 400, "activityId and reason are required");
+
+                if (!activityId.has_value() || activityId->empty()) {
+                  return json_error(res, 400, "activityId is required");
+                }
+
+                if (!reason.has_value() || reason->empty()) {
+                  return json_error(res, 400, "reason is required");
+                }
+
+                if (reason->size() < 5) {
+                  return json_error(res, 400, "reason must be at least 5 characters");
+                }
+
+                if (!is_valid_activity_id(*activityId)) {
+                  return json_error(res, 400, "activityId must contain only letters, numbers, underscores, or hyphens");
                 }
 
                 std::string err;
