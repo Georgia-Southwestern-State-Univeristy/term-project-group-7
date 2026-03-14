@@ -109,7 +109,7 @@ static std::string now_iso8601() {
   using namespace std::chrono;
   auto now = system_clock::now();
   auto t = system_clock::to_time_t(now);
-  std::tm tm {};
+  std::tm tm{};
 #ifdef _WIN32
   gmtime_s(&tm, &t);
 #else
