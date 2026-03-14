@@ -1,4 +1,4 @@
-# Observability (Beta)
+# Observability Starter + Error Handling
 
 ## Where Logs Live
 Logs are written to the terminal where the C++ server is running:
