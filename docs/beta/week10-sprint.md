@@ -13,13 +13,17 @@ By Friday, the Beta MVP is safer and easier to use through basic server-side acc
 - Requests with the wrong role return `403`
 - Authorized teacher/admin requests succeed
 
+---
+
 ### 2. Document authentication and protected routes
 **Owner:** Grey
 
 **Acceptance Criteria:**
 - `docs/security/auth.md` explains how auth works
 - Protected endpoint(s), role model, and limitations are documented
-- Evidence section includes PR link placeholder and demo notes
+- Evidence section includes PR link and demo notes
+
+---
 
 ### 3. Strengthen validation on teacher override
 **Owner:** Grey
@@ -29,6 +33,8 @@ By Friday, the Beta MVP is safer and easier to use through basic server-side acc
 - Missing or too-short `reason` returns clear `400` error
 - Invalid `activityId` format returns clear `400` error
 
+---
+
 ### 4. Document Week 10 security risks and fixes
 **Owner:** Grey
 
@@ -36,6 +42,8 @@ By Friday, the Beta MVP is safer and easier to use through basic server-side acc
 - `docs/security/week10-security-notes.md` lists 3 concrete risks from this system
 - At least 2 mitigations are implemented and described
 - Before/after behavior is documented
+
+---
 
 ### 5. Add Week 10 auth/validation/regression tests
 **Owner:** Grey
@@ -46,13 +54,30 @@ By Friday, the Beta MVP is safer and easier to use through basic server-side acc
 - At least 1 validation failure test is added
 - At least 1 regression test is added
 
+---
+
 ### 6. Improve Beta usability for common failure cases
 **Owner:** Grey
 
 **Acceptance Criteria:**
 - At least 2 UX improvements are implemented
-- `docs/beta/week10-ux.md` explains before/after behavior
-- Evidence section includes PR link placeholder and CI note
+- `docs/security/week10-ux.md` explains before/after behavior
+- Evidence section includes PR link and CI note
+
+---
 
 ## Evidence
-**Project Board Sprint View:** (week 10 project link board)
+
+**Project Board Sprint View:**  
+https://github.com/orgs/Georgia-Southwestern-State-Univeristy/projects
+
+**PRs Implementing Sprint Work:**
+
+- Auth + documentation PR  
+https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/PR_NUMBER
+
+- Access control + validation implementation PR  
+https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/PR_NUMBER
+
+- Auth / validation / regression tests PR  
+https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/PR_NUMBER
