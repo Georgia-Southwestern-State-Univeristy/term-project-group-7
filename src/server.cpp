@@ -176,50 +176,51 @@ int main() {
                                "application/json; charset=utf-8");
              });
 
-    server.Post(R"(/api/students/([A-Za-z0-9_]+)/teacher-override)",
-              [&](const httplib::Request &req, httplib::Response &res) {
-                const std::string studentId = req.matches[1];
+  server.Post(R"(/api/students/([A-Za-z0-9_]+)/teacher-override)", [&](const httplib::Request &req,
+                                                                       httplib::Response &res) {
+    const std::string studentId = req.matches[1];
 
-                if (!has_valid_auth_token(req)) {
-                  return json_error(res, 401, "missing or invalid auth token");
-                }
+    if (!has_valid_auth_token(req)) {
+      return json_error(res, 401, "missing or invalid auth token");
+    }
 
-                if (!can_teacher_override(req)) {
-                  return json_error(res, 403, "user role is not allowed to perform teacher override");
-                }
+    if (!can_teacher_override(req)) {
+      return json_error(res, 403, "user role is not allowed to perform teacher override");
+    }
 
-                auto activityId = json_get_string(req.body, "activityId");
-                auto reason = json_get_string(req.body, "reason");
+    auto activityId = json_get_string(req.body, "activityId");
+    auto reason = json_get_string(req.body, "reason");
 
-                if (!activityId.has_value() || activityId->empty()) {
-                  return json_error(res, 400, "activityId is required");
-                }
+    if (!activityId.has_value() || activityId->empty()) {
+      return json_error(res, 400, "activityId is required");
+    }
 
-                if (!reason.has_value() || reason->empty()) {
-                  return json_error(res, 400, "reason is required");
-                }
+    if (!reason.has_value() || reason->empty()) {
+      return json_error(res, 400, "reason is required");
+    }
 
-                if (reason->size() < 5) {
-                  return json_error(res, 400, "reason must be at least 5 characters");
-                }
+    if (reason->size() < 5) {
+      return json_error(res, 400, "reason must be at least 5 characters");
+    }
 
-                if (!is_valid_activity_id(*activityId)) {
-                  return json_error(res, 400, "activityId must contain only letters, numbers, underscores, or hyphens");
-                }
+    if (!is_valid_activity_id(*activityId)) {
+      return json_error(res, 400,
+                        "activityId must contain only letters, numbers, underscores, or hyphens");
+    }
 
-                std::string err;
-                auto rec = svc.teacher_override(studentId, *activityId, *reason, err);
-                if (!rec.has_value()) {
-                  return json_error(res, 404, err);
-                }
+    std::string err;
+    auto rec = svc.teacher_override(studentId, *activityId, *reason, err);
+    if (!rec.has_value()) {
+      return json_error(res, 404, err);
+    }
 
-                res.status = 200;
-                res.set_content(std::string("{\"recommendationId\":\"") + rec->recommendationId +
-                                    "\",\"studentId\":\"" + rec->studentId +
-                                    "\",\"activityId\":\"" + rec->activityId + "\",\"reason\":\"" +
-                                    rec->reason + "\",\"source\":\"" + rec->source + "\"}",
-                                "application/json; charset=utf-8");
-              });
+    res.status = 200;
+    res.set_content(std::string("{\"recommendationId\":\"") + rec->recommendationId +
+                        "\",\"studentId\":\"" + rec->studentId + "\",\"activityId\":\"" +
+                        rec->activityId + "\",\"reason\":\"" + rec->reason + "\",\"source\":\"" +
+                        rec->source + "\"}",
+                    "application/json; charset=utf-8");
+  });
 
   std::cout << "Running on http://127.0.0.1:5000\n";
 
