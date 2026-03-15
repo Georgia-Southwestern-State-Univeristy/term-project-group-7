@@ -29,6 +29,11 @@ The logging system records:
 - HTTP status code
 - relevant request context
 
+Errors:
+- `validation_error`
+- `domain_error` 
+- `http_error`
+
 ## Logged Failure Cases
 
 The following common failures are logged:

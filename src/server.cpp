@@ -1,6 +1,11 @@
+#include <atomic>
+#include <chrono>
+#include <iomanip>
 #include <iostream>
 #include <optional>
+#include <sstream>
 #include <string>
+#include <vector>
 
 #include "httplib.h"
 #include "menu/menu.h"
@@ -66,6 +71,93 @@ static void json_error(httplib::Response &res, int code, const std::string &msg)
   res.set_content(std::string("{\"error\":\"") + msg + "\"}", "application/json; charset=utf-8");
 }
 
+struct LogField {
+  std::string key;
+  std::string value;
+  bool quote = true;
+};
+
+static std::string json_escape(const std::string &s) {
+  std::string out;
+  out.reserve(s.size() + 8);
+  for (char c : s) {
+    switch (c) {
+    case '\\':
+      out += "\\\\";
+      break;
+    case '"':
+      out += "\\\"";
+      break;
+    case '\n':
+      out += "\\n";
+      break;
+    case '\r':
+      out += "\\r";
+      break;
+    case '\t':
+      out += "\\t";
+      break;
+    default:
+      out += c;
+      break;
+    }
+  }
+  return out;
+}
+
+static std::string now_iso8601() {
+  using namespace std::chrono;
+  auto now = system_clock::now();
+  auto t = system_clock::to_time_t(now);
+  std::tm tm{};
+#ifdef _WIN32
+  gmtime_s(&tm, &t);
+#else
+  gmtime_r(&t, &tm);
+#endif
+  std::ostringstream oss;
+  oss << std::put_time(&tm, "%Y-%m-%dT%H:%M:%SZ");
+  return oss.str();
+}
+
+static std::string new_request_id() {
+  static std::atomic<uint64_t> counter{0};
+  using namespace std::chrono;
+  auto now = system_clock::now();
+  auto ms = duration_cast<milliseconds>(now.time_since_epoch()).count();
+  return "req-" + std::to_string(ms) + "-" + std::to_string(counter++);
+}
+
+static std::string ensure_request_id(const httplib::Request &req, httplib::Response &res) {
+  const auto incoming = req.get_header_value("X-Request-Id");
+  if (!incoming.empty()) {
+    res.set_header("X-Request-Id", incoming);
+    return incoming;
+  }
+  auto id = new_request_id();
+  res.set_header("X-Request-Id", id);
+  return id;
+}
+
+static void log_json(std::ostream &out, const std::string &level, const std::string &event,
+                     const std::vector<LogField> &fields) {
+  std::ostringstream oss;
+  oss << "{";
+  oss << "\"ts\":\"" << json_escape(now_iso8601()) << "\",";
+  oss << "\"level\":\"" << json_escape(level) << "\",";
+  oss << "\"event\":\"" << json_escape(event) << "\"";
+  for (const auto &f : fields) {
+    oss << ",\"" << json_escape(f.key) << "\":";
+    if (f.quote) {
+      oss << "\"" << json_escape(f.value) << "\"";
+    } else {
+      oss << f.value;
+    }
+  }
+  oss << "}";
+  out << oss.str() << "\n";
+}
+
 int main() {
   runMainMenu();
 
@@ -74,24 +166,72 @@ int main() {
   InMemoryStore store;
   MvpService svc(store);
 
-  server.Get("/", [](const httplib::Request &, httplib::Response &res) {
+  server.set_logger([](const httplib::Request &req, const httplib::Response &res) {
+    const auto requestId = res.get_header_value("X-Request-Id");
+    log_json(std::cout, "info", "http_request",
+             {
+                 {"request_id", requestId.empty() ? "-" : requestId},
+                 {"method", req.method},
+                 {"path", req.path},
+                 {"status", std::to_string(res.status), false},
+             });
+  });
+
+  server.set_error_logger([](const httplib::Error &err, const httplib::Request *req) {
+    log_json(std::cerr, "error", "http_error",
+             {
+                 {"error", std::to_string(static_cast<int>(err))},
+                 {"method", req ? req->method : "-"},
+                 {"path", req ? req->path : "-"},
+             });
+  });
+
+  server.Get("/", [](const httplib::Request &req, httplib::Response &res) {
+    ensure_request_id(req, res);
     res.set_content(INDEX_HTML, "text/html; charset=utf-8");
   });
 
-  server.Get("/api/health", [](const httplib::Request &, httplib::Response &res) {
+  server.Get("/api/health", [](const httplib::Request &req, httplib::Response &res) {
+    ensure_request_id(req, res);
     res.set_content(R"({"status":"ok","service":"cpp"})", "application/json; charset=utf-8");
   });
 
   server.Post("/api/students", [&](const httplib::Request &req, httplib::Response &res) {
+    const auto requestId = ensure_request_id(req, res);
+    if (req.body.empty()) {
+      log_json(std::cerr, "error", "validation_error",
+               {
+                   {"request_id", requestId},
+                   {"action", "create_student"},
+                   {"field", "body"},
+                   {"reason", "request body is required"},
+               });
+      return json_error(res, 400, "request body is required");
+    }
     auto name = json_get_string(req.body, "name");
     auto grade = json_get_int(req.body, "gradeLevel");
     if (!name.has_value() || !grade.has_value()) {
+      log_json(std::cerr, "error", "validation_error",
+               {
+                   {"request_id", requestId},
+                   {"action", "create_student"},
+                   {"field", "name|gradeLevel"},
+                   {"reason", "missing required fields"},
+               });
       return json_error(res, 400, "name and gradeLevel are required");
     }
 
     std::string err;
     auto s = svc.create_student(*name, *grade, err);
     if (!s.has_value()) {
+      log_json(std::cerr, "error", "domain_error",
+               {
+                   {"request_id", requestId},
+                   {"action", "create_student"},
+                   {"reason", err},
+                   {"name", name.value_or("-")},
+                   {"gradeLevel", std::to_string(grade.value_or(-1)), false},
+               });
       return json_error(res, 400, err);
     }
 
@@ -99,21 +239,57 @@ int main() {
     res.set_content(std::string("{\"studentId\":\"") + s->studentId + "\",\"name\":\"" + s->name +
                         "\",\"gradeLevel\":" + std::to_string(s->gradeLevel) + "}",
                     "application/json; charset=utf-8");
+    log_json(std::cout, "info", "create_student",
+             {
+                 {"request_id", requestId},
+                 {"studentId", s->studentId},
+                 {"name", s->name},
+                 {"gradeLevel", std::to_string(s->gradeLevel), false},
+             });
   });
 
   server.Post(R"(/api/students/([A-Za-z0-9_]+)/assessments)",
               [&](const httplib::Request &req, httplib::Response &res) {
                 const std::string studentId = req.matches[1];
+                const auto requestId = ensure_request_id(req, res);
+                if (req.body.empty()) {
+                  log_json(std::cerr, "error", "validation_error",
+                           {
+                               {"request_id", requestId},
+                               {"action", "add_assessment"},
+                               {"studentId", studentId},
+                               {"field", "body"},
+                               {"reason", "request body is required"},
+                           });
+                  return json_error(res, 400, "request body is required");
+                }
 
                 auto skill = json_get_string(req.body, "skill");
                 auto score = json_get_int(req.body, "score");
                 if (!skill.has_value() || !score.has_value()) {
+                  log_json(std::cerr, "error", "validation_error",
+                           {
+                               {"request_id", requestId},
+                               {"action", "add_assessment"},
+                               {"studentId", studentId},
+                               {"field", "skill|score"},
+                               {"reason", "missing required fields"},
+                           });
                   return json_error(res, 400, "skill and score are required");
                 }
 
                 std::string err;
                 auto a = svc.add_assessment_and_recommend(studentId, *skill, *score, err);
                 if (!a.has_value()) {
+                  log_json(std::cerr, "error", "domain_error",
+                           {
+                               {"request_id", requestId},
+                               {"action", "add_assessment"},
+                               {"studentId", studentId},
+                               {"skill", skill.value_or("-")},
+                               {"score", std::to_string(score.value_or(-1)), false},
+                               {"reason", err},
+                           });
                   if (err == "student not found")
                     return json_error(res, 404, err);
                   return json_error(res, 400, err);
@@ -124,15 +300,31 @@ int main() {
                                     "\",\"studentId\":\"" + a->studentId + "\",\"skill\":\"" +
                                     a->skill + "\",\"score\":" + std::to_string(a->score) + "}",
                                 "application/json; charset=utf-8");
+                log_json(std::cout, "info", "add_assessment",
+                         {
+                             {"request_id", requestId},
+                             {"assessmentId", a->assessmentId},
+                             {"studentId", a->studentId},
+                             {"skill", a->skill},
+                             {"score", std::to_string(a->score), false},
+                         });
               });
 
   server.Get(R"(/api/students/([A-Za-z0-9_]+)/recommendations/latest)",
              [&](const httplib::Request &req, httplib::Response &res) {
                const std::string studentId = req.matches[1];
+               const auto requestId = ensure_request_id(req, res);
 
                std::string err;
                auto rec = svc.latest_recommendation(studentId, err);
                if (!rec.has_value()) {
+                 log_json(std::cerr, "error", "domain_error",
+                          {
+                              {"request_id", requestId},
+                              {"action", "get_latest_recommendation"},
+                              {"studentId", studentId},
+                              {"reason", err},
+                          });
                  return json_error(res, 404, err);
                }
 
@@ -142,21 +334,57 @@ int main() {
                                    rec->activityId + "\",\"reason\":\"" + rec->reason +
                                    "\",\"source\":\"" + rec->source + "\"}",
                                "application/json; charset=utf-8");
+               log_json(std::cout, "info", "get_latest_recommendation",
+                        {
+                            {"request_id", requestId},
+                            {"studentId", rec->studentId},
+                            {"recommendationId", rec->recommendationId},
+                            {"activityId", rec->activityId},
+                            {"source", rec->source},
+                        });
              });
 
   server.Post(R"(/api/students/([A-Za-z0-9_]+)/teacher-override)",
               [&](const httplib::Request &req, httplib::Response &res) {
                 const std::string studentId = req.matches[1];
+                const auto requestId = ensure_request_id(req, res);
+                if (req.body.empty()) {
+                  log_json(std::cerr, "error", "validation_error",
+                           {
+                               {"request_id", requestId},
+                               {"action", "teacher_override"},
+                               {"studentId", studentId},
+                               {"field", "body"},
+                               {"reason", "request body is required"},
+                           });
+                  return json_error(res, 400, "request body is required");
+                }
 
                 auto activityId = json_get_string(req.body, "activityId");
                 auto reason = json_get_string(req.body, "reason");
                 if (!activityId.has_value() || !reason.has_value()) {
+                  log_json(std::cerr, "error", "validation_error",
+                           {
+                               {"request_id", requestId},
+                               {"action", "teacher_override"},
+                               {"studentId", studentId},
+                               {"field", "activityId|reason"},
+                               {"reason", "missing required fields"},
+                           });
                   return json_error(res, 400, "activityId and reason are required");
                 }
 
                 std::string err;
                 auto rec = svc.teacher_override(studentId, *activityId, *reason, err);
                 if (!rec.has_value()) {
+                  log_json(std::cerr, "error", "domain_error",
+                           {
+                               {"request_id", requestId},
+                               {"action", "teacher_override"},
+                               {"studentId", studentId},
+                               {"activityId", activityId.value_or("-")},
+                               {"reason", err},
+                           });
                   return json_error(res, 404, err);
                 }
 
@@ -166,6 +394,13 @@ int main() {
                                     "\",\"activityId\":\"" + rec->activityId + "\",\"reason\":\"" +
                                     rec->reason + "\",\"source\":\"" + rec->source + "\"}",
                                 "application/json; charset=utf-8");
+                log_json(std::cout, "info", "teacher_override",
+                         {
+                             {"request_id", requestId},
+                             {"studentId", rec->studentId},
+                             {"recommendationId", rec->recommendationId},
+                             {"activityId", rec->activityId},
+                         });
               });
 
   std::cout << "Running on http://127.0.0.1:5000\n";
