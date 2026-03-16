@@ -113,3 +113,45 @@ if (WIN32)
   target_link_libraries(test_boundary_score_70_cutoff PRIVATE ws2_32)
 endif()
 add_test(NAME boundary_score_70_cutoff COMMAND test_boundary_score_70_cutoff)
+
+# --- Week 10 tests ---
+
+add_executable(test_auth_teacher_override_unauthorized tests/test_auth_teacher_override_unauthorized.cpp)
+target_include_directories(test_auth_teacher_override_unauthorized PRIVATE
+  ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_SOURCE_DIR}/src
+)
+if (WIN32)
+  target_link_libraries(test_auth_teacher_override_unauthorized PRIVATE ws2_32)
+endif()
+add_test(NAME auth_teacher_override_unauthorized COMMAND test_auth_teacher_override_unauthorized)
+
+add_executable(test_auth_teacher_override_authorized tests/test_auth_teacher_override_authorized.cpp)
+target_include_directories(test_auth_teacher_override_authorized PRIVATE
+  ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_SOURCE_DIR}/src
+)
+if (WIN32)
+  target_link_libraries(test_auth_teacher_override_authorized PRIVATE ws2_32)
+endif()
+add_test(NAME auth_teacher_override_authorized COMMAND test_auth_teacher_override_authorized)
+
+add_executable(test_validation_teacher_override_missing_reason tests/test_validation_teacher_override_missing_reason.cpp)
+target_include_directories(test_validation_teacher_override_missing_reason PRIVATE
+  ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_SOURCE_DIR}/src
+)
+if (WIN32)
+  target_link_libraries(test_validation_teacher_override_missing_reason PRIVATE ws2_32)
+endif()
+add_test(NAME validation_teacher_override_missing_reason COMMAND test_validation_teacher_override_missing_reason)
+
+add_executable(test_regression_unknown_student_recommendation tests/test_regression_unknown_student_recommendation.cpp)
+target_include_directories(test_regression_unknown_student_recommendation PRIVATE
+  ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_SOURCE_DIR}/src
+)
+if (WIN32)
+  target_link_libraries(test_regression_unknown_student_recommendation PRIVATE ws2_32)
+endif()
+add_test(NAME regression_unknown_student_recommendation COMMAND test_regression_unknown_student_recommendation)
