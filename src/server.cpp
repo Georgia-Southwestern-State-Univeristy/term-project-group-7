@@ -12,6 +12,7 @@
 
 #include "in_memory_store.h"
 #include "mvp_service.h"
+#include <cctype>
 
 static const char *INDEX_HTML = R"HTML(
 <!DOCTYPE html>
