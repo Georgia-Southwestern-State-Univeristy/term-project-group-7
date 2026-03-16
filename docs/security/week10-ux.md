@@ -38,5 +38,10 @@ Less trial-and-error when correcting requests during Beta testing.
 
 UX improvements implemented and verified in CI.
 
-Tests PR:  
-https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/PR_NUMBER
+Tests PR:
+
+https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/37
+
+CI Test Run:
+
+https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/actions/runs/23141529220

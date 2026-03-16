@@ -65,6 +65,6 @@ Validation was improved on these inputs:
 
 ## Evidence
 
-Validation and security fixes implemented in:
+Security fixes implemented in:
 
-https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/PR_NUMBER
+https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/38

@@ -68,16 +68,16 @@ By Friday, the Beta MVP is safer and easier to use through basic server-side acc
 
 ## Evidence
 
-**Project Board Sprint View:**  
+**Project Board Sprint View:**
 https://github.com/orgs/Georgia-Southwestern-State-Univeristy/projects
 
 **PRs Implementing Sprint Work:**
 
-- Auth + documentation PR  
-https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/PR_NUMBER
+Auth + documentation PR  
+https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/36
 
-- Access control + validation implementation PR  
-https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/PR_NUMBER
+Access control + validation implementation PR  
+https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/38
 
-- Auth / validation / regression tests PR  
-https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/PR_NUMBER
+Auth / validation / regression tests PR  
+https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/37

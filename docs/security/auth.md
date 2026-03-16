@@ -92,5 +92,6 @@ result → `200 OK`
 
 ## Evidence
 
-Implementation PR:  
-https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/PR_NUMBER
+Authentication and access control implemented in:
+
+https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/38
