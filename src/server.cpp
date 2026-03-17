@@ -1,6 +1,8 @@
 #include <iostream>
 #include <optional>
 #include <string>
+#include <sqlite3.h>
+#include <filesystem>
 
 #include "httplib.h"
 #include "menu/menu.h"
@@ -66,8 +68,72 @@ static void json_error(httplib::Response &res, int code, const std::string &msg)
   res.set_content(std::string("{\"error\":\"") + msg + "\"}", "application/json; charset=utf-8");
 }
 
+void createQuestionBank(sqlite3 *db) {
+  const char *sql = "CREATE TABLE IF NOT EXISTS questions ("
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    "topic TEXT NOT NULL,"
+                    "grade_level INTEGER NOT NULL,"
+                    "question_type TEXT NOT NULL,"
+                    "question_text TEXT NOT NULL,"
+                    "operand1 REAL,"
+                    "operand2 REAL,"
+                    "operand3 REAL,"
+                    "operand4 REAL,"
+                    "correct_answer REAL NOT NULL,"
+                    "explanation TEXT"
+                    ");";
+
+  char *errMsg;
+
+  if (sqlite3_exec(db, sql, nullptr, nullptr, &errMsg) != SQLITE_OK) {
+    std::cout << "Error creating table: " << errMsg << std::endl;
+    sqlite3_free(errMsg);
+  }
+}
+
+void printAllQuestions(sqlite3 *db) {
+  const char *sql = "SELECT id, topic, grade_level, question_text, correct_answer FROM questions;";
+
+  sqlite3_stmt *stmt;
+
+  if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+    std::cout << "Failed to prepare statement\n";
+    return;
+  }
+
+  std::cout << "\n--- Questions in Database ---\n";
+
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    int id = sqlite3_column_int(stmt, 0);
+    const char *topic = (const char *)sqlite3_column_text(stmt, 1);
+    int grade = sqlite3_column_int(stmt, 2);
+    const char *question = (const char *)sqlite3_column_text(stmt, 3);
+    double answer = sqlite3_column_double(stmt, 4);
+
+    std::cout << "ID: " << id << "\n";
+    std::cout << "Topic: " << topic << "\n";
+    std::cout << "Grade: " << grade << "\n";
+    std::cout << "Question: " << question << "\n";
+    std::cout << "Answer: " << answer << "\n";
+    std::cout << "-----------------------------\n";
+  }
+
+  sqlite3_finalize(stmt);
+}
 int main() {
   runMainMenu();
+
+   sqlite3 *db;
+
+ if (sqlite3_open("questions.db", &db) != SQLITE_OK) {
+     std::cout << "Failed to open database: " << sqlite3_errmsg(db) << std::endl;
+     return 1;
+   }
+
+  std::cout << "\nDatabase opened successfully.\n";
+  std::cout << "Current directory: " << std::filesystem::current_path() << std::endl;
+  createQuestionBank(db);
+  printAllQuestions(db);
 
   httplib::Server server;
 
@@ -144,6 +210,23 @@ int main() {
                                "application/json; charset=utf-8");
              });
 
+  server.Get("/api/questions/random", [&](const httplib::Request &, httplib::Response &res) {
+    const char *sql = "SELECT question_text FROM questions "
+                      "ORDER BY RANDOM() LIMIT 1;";
+
+    sqlite3_stmt *stmt;
+
+    sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+      std::string question = (const char *)sqlite3_column_text(stmt, 0);
+
+      res.set_content(std::string("{\"question\":\"") + question + "\"}", "application/json");
+    }
+
+    sqlite3_finalize(stmt);
+  });
+
   server.Post(R"(/api/students/([A-Za-z0-9_]+)/teacher-override)",
               [&](const httplib::Request &req, httplib::Response &res) {
                 const std::string studentId = req.matches[1];
@@ -171,5 +254,7 @@ int main() {
   std::cout << "Running on http://127.0.0.1:5000\n";
 
   server.listen("127.0.0.1", 5000);
+
+  sqlite3_close(db);
   return 0;
 }
