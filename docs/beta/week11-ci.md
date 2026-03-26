@@ -99,7 +99,7 @@ https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/ac
 ## Week 11 Evidence
 
 **PR Link:**  
-(PR LINK WILL BE INSERTED ONCE CREATED)
+https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/40
 
 **Passing CI Run:**  
-(PR LINK WILL BE INSERTED ONCE CREATED)
+https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/actions/runs/23611166317
