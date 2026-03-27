@@ -86,4 +86,5 @@ https://github.com/orgs/Georgia-Southwestern-State-Univeristy/projects
   `docs/beta/week10-sprint.md`
 
 **Week 11 submission PR:**  
-(PR LINK WILL BE REPLACED WHEN CREATED)
+Week 11 submission PR:
+https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/40
