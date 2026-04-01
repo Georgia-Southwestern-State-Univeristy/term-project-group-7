@@ -4,10 +4,16 @@
 This project demonstrates a minimal end-to-end **thin vertical slice** that proves the system runs.
 The goal is execution and workflow discipline, not feature completeness.
 
-The application serves a simple web page and exposes backend endpoints to confirm the system is functioning end-to-end.
+The current Beta implementation is a **CLI-based math practice application** that demonstrates a complete runnable workflow.
 
-- Web page: `GET /`
-- Health endpoint: `GET /api/health` → returns HTTP 200
+Users can:
+- Select a math operation (addition, subtraction, multiplication, division)
+- Choose a problem type (integers, decimals)
+- Solve generated problems
+- Receive immediate feedback
+- Experience input validation
+
+The project is designed to evolve into a broader system (including a browser-based interface), but the current Beta is evaluated through a CLI workflow.
 
 ---
 
@@ -15,7 +21,7 @@ The application serves a simple web page and exposes backend endpoints to confir
 - C++17
 - CMake (build system)
 - CTest (tests)
-- cpp-httplib (single-header HTTP server/client)
+- Standard C++ CLI application (no web server in current Beta)
 - clang-format (formatting)
 - GitHub Actions (CI)
 
