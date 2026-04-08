@@ -1,73 +1,7 @@
-/*
-** 2001-09-15
-**
-** The author disclaims copyright to this source code.  In place of
-** a legal notice, here is a blessing:
-**
-**    May you do good and not evil.
-**    May you find forgiveness for yourself and forgive others.
-**    May you share freely, never taking more than you give.
-**
-*************************************************************************
-** This header file defines the interface that the SQLite library
-** presents to client programs.  If a C-function, structure, datatype,
-** or constant definition does not appear in this file, then it is
-** not a published API of SQLite, is subject to change without
-** notice, and should not be referenced by programs that use SQLite.
-**
-** Some of the definitions that are in this file are marked as
-** "experimental".  Experimental interfaces are normally new
-** features recently added to SQLite.  We do not anticipate changes
-** to experimental interfaces but reserve the right to make minor changes
-** if experience from use "in the wild" suggest such changes are prudent.
-**
-** The official C-language API documentation for SQLite is derived
-** from comments in this file.  This file is the authoritative source
-** on how SQLite interfaces are supposed to operate.
-**
-** The name of this file under configuration management is "sqlite.h.in".
-** The makefile makes some minor changes to this file (such as inserting
-** the version number) and changes its name to "sqlite3.h" as
-** part of the build process.
-*/
-#ifndef SQLITE3_H
-#define SQLITE3_H
-#include <stdarg.h>     /* Needed for the definition of va_list */
-
-/*
-** Make sure we can call this stuff from C++.
-*/
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
-/*
-** Facilitate override of interface linkage and calling conventions.
-** Be aware that these macros may not be used within this particular
-** translation of the amalgamation and its associated header file.
-**
-** The SQLITE_EXTERN and SQLITE_API macros are used to instruct the
-** compiler that the target identifier should have external linkage.
-**
-** The SQLITE_CDECL macro is used to set the calling convention for
-** public functions that accept a variable number of arguments.
-**
-** The SQLITE_APICALL macro is used to set the calling convention for
-** public functions that accept a fixed number of arguments.
-**
-** The SQLITE_STDCALL macro is no longer used and is now deprecated.
-**
-** The SQLITE_CALLBACK macro is used to set the calling convention for
-** function pointers.
-**
-** The SQLITE_SYSAPI macro is used to set the calling convention for
-** functions provided by the operating system.
-**
-** Currently, the SQLITE_CDECL, SQLITE_APICALL, SQLITE_CALLBACK, and
-** SQLITE_SYSAPI macros are used only when building for environments
-** that require non-default calling conventions.
-*/
 #ifndef SQLITE_EXTERN
 # define SQLITE_EXTERN extern
 #endif
@@ -90,25 +24,9 @@ extern "C" {
 # define SQLITE_SYSAPI
 #endif
 
-/*
-** These no-op macros are used in front of interfaces to mark those
-** interfaces as either deprecated or experimental.  New applications
-** should not use deprecated interfaces - they are supported for backwards
-** compatibility only.  Application writers should be aware that
-** experimental interfaces are subject to change in point releases.
-**
-** These macros used to resolve to various kinds of compiler magic that
-** would generate warning messages when they were used.  But that
-** compiler magic ended up generating such a flurry of bug reports
-** that we have taken it all out and gone back to using simple
-** noop macros.
-*/
 #define SQLITE_DEPRECATED
 #define SQLITE_EXPERIMENTAL
 
-/*
-** Ensure these symbols were not defined by some previous header file.
-*/
 #ifdef SQLITE_VERSION
 # undef SQLITE_VERSION
 #endif
