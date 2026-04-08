@@ -1,11 +1,15 @@
+#include <filesystem>
 #include <iostream>
 #include <optional>
-#include <string>
 #include <sqlite3.h>
-#include <filesystem>
+#include <string>
 
+#include "gui/main_menu_gui.h"
+#include "gui/addition_gui.h"
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#define WIN32_LEAN_AND_MEAN
 #include "httplib.h"
-#include "menu/menu.h"
 
 #include "in_memory_store.h"
 #include "mvp_service.h"
@@ -91,50 +95,18 @@ void createQuestionBank(sqlite3 *db) {
   }
 }
 
-void printAllQuestions(sqlite3 *db) {
-  const char *sql = "SELECT id, topic, grade_level, question_text, correct_answer FROM questions;";
-
-  sqlite3_stmt *stmt;
-
-  if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
-    std::cout << "Failed to prepare statement\n";
-    return;
-  }
-
-  std::cout << "\n--- Questions in Database ---\n";
-
-  while (sqlite3_step(stmt) == SQLITE_ROW) {
-    int id = sqlite3_column_int(stmt, 0);
-    const char *topic = (const char *)sqlite3_column_text(stmt, 1);
-    int grade = sqlite3_column_int(stmt, 2);
-    const char *question = (const char *)sqlite3_column_text(stmt, 3);
-    double answer = sqlite3_column_double(stmt, 4);
-
-    std::cout << "ID: " << id << "\n";
-    std::cout << "Topic: " << topic << "\n";
-    std::cout << "Grade: " << grade << "\n";
-    std::cout << "Question: " << question << "\n";
-    std::cout << "Answer: " << answer << "\n";
-    std::cout << "-----------------------------\n";
-  }
-
-  sqlite3_finalize(stmt);
-}
 int main() {
-  runMainMenu();
 
-   sqlite3 *db;
+  sqlite3 *db;
 
- if (sqlite3_open("questions.db", &db) != SQLITE_OK) {
-     std::cout << "Failed to open database: " << sqlite3_errmsg(db) << std::endl;
-     return 1;
-   }
+  if (sqlite3_open("../../../questions.db", &db) != SQLITE_OK) {
+    std::cout << "Failed to open database: " << sqlite3_errmsg(db) << std::endl;
+    return 1;
+  }
 
-  std::cout << "\nDatabase opened successfully.\n";
-  std::cout << "Current directory: " << std::filesystem::current_path() << std::endl;
-  createQuestionBank(db);
-  printAllQuestions(db);
-
+  
+  OpenMainMenuWindow();
+  
   httplib::Server server;
 
   InMemoryStore store;
