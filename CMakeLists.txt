@@ -146,6 +146,16 @@ if (WIN32)
 endif()
 add_test(NAME validation_teacher_override_missing_reason COMMAND test_validation_teacher_override_missing_reason)
 
+add_executable(test_refactor_assessment_missing_skill tests/test_refactor_assessment_missing_skill.cpp)
+target_include_directories(test_refactor_assessment_missing_skill PRIVATE
+  ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_SOURCE_DIR}/src
+)
+if (WIN32)
+  target_link_libraries(test_refactor_assessment_missing_skill PRIVATE ws2_32)
+endif()
+add_test(NAME refactor_assessment_missing_skill COMMAND test_refactor_assessment_missing_skill)
+
 add_executable(test_regression_unknown_student_recommendation tests/test_regression_unknown_student_recommendation.cpp)
 target_include_directories(test_regression_unknown_student_recommendation PRIVATE
   ${CMAKE_SOURCE_DIR}/include
