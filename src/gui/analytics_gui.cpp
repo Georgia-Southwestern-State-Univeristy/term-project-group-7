@@ -43,10 +43,10 @@ static std::string BuildAnalyticsReportText(sqlite3 *database) {
       int totalAnswered = sqlite3_column_int(preparedStatement, 2);
       double overallScore = totalAnswered > 0 ? totalCorrect * 100.0 / totalAnswered : 0.0;
 
-      report << "Total answered  : " << totalAnswered   << "\r\n";
-      report << "Correct         : " << totalCorrect    << "\r\n";
-      report << "Incorrect       : " << totalIncorrect  << "\r\n";
-      report << "Overall score   : " << overallScore    << "%\r\n";
+      report << "Total answered  : " << totalAnswered << "\r\n";
+      report << "Correct         : " << totalCorrect << "\r\n";
+      report << "Incorrect       : " << totalIncorrect << "\r\n";
+      report << "Overall score   : " << overallScore << "%\r\n";
     } else {
       report << "No sessions have been recorded yet.\r\n";
     }
@@ -85,11 +85,11 @@ static std::string BuildAnalyticsReportText(sqlite3 *database) {
       int total = sqlite3_column_int(preparedStatement, 3);
       double score = total > 0 ? correct * 100.0 / total : 0.0;
 
-      report << "\r\n" << topicName             << "\r\n";
-      report << "  Answered  : " << total       << "\r\n";
-      report << "  Correct   : " << correct     << "\r\n";
-      report << "  Incorrect : " << incorrect   << "\r\n";
-      report << "  Score     : " << score       << "%\r\n";
+      report << "\r\n" << topicName << "\r\n";
+      report << "  Answered  : " << total << "\r\n";
+      report << "  Correct   : " << correct << "\r\n";
+      report << "  Incorrect : " << incorrect << "\r\n";
+      report << "  Score     : " << score << "%\r\n";
     }
 
     if (!anyRowsFound)
@@ -124,11 +124,11 @@ static std::string BuildAnalyticsReportText(sqlite3 *database) {
       int total = sqlite3_column_int(preparedStatement, 3);
       double score = total > 0 ? correct * 100.0 / total : 0.0;
 
-      report << "\r\nGrade "     << gradeLevel  << "\r\n";
-      report << "  Answered  : " << total       << "\r\n";
-      report << "  Correct   : " << correct     << "\r\n";
-      report << "  Incorrect : " << incorrect   << "\r\n";
-      report << "  Score     : " << score       << "%\r\n";
+      report << "\r\nGrade " << gradeLevel << "\r\n";
+      report << "  Answered  : " << total << "\r\n";
+      report << "  Correct   : " << correct << "\r\n";
+      report << "  Incorrect : " << incorrect << "\r\n";
+      report << "  Score     : " << score << "%\r\n";
     }
 
     if (!anyRowsFound)
@@ -171,8 +171,8 @@ static std::string BuildAnalyticsReportText(sqlite3 *database) {
       strftime(formattedDate, sizeof(formattedDate), "%m/%d/%Y %H:%M", timeInfo);
 
       report << "\r\n"
-             << formattedDate   << "  " << topicName  << " Grade " << gradeLevel   << "  "
-             << correctCount    << "/"  << totalCount << " ("      << scorePercent << "%)\r\n";
+             << formattedDate << "  " << topicName << " Grade " << gradeLevel << "  "
+             << correctCount << "/" << totalCount << " (" << scorePercent << "%)\r\n";
     }
 
     if (!anyRowsFound)

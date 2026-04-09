@@ -6,10 +6,10 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-#define ADDITION_BUTTON_ID      101
-#define SUBTRACTION_BUTTON_ID   102
-#define GRADE_DROPDOWN_ID       103
-#define ANALYTICS_BUTTON_ID     104
+#define ADDITION_BUTTON_ID 101
+#define SUBTRACTION_BUTTON_ID 102
+#define GRADE_DROPDOWN_ID 103
+#define ANALYTICS_BUTTON_ID 104
 
 void ShowAnalyticsWindow(HWND parentWindow);
 

@@ -122,11 +122,10 @@ void QuestionBank::saveSessionResults(const std::string &sessionId, int gradeLev
 
   sqlite3_exec(database, "BEGIN;", nullptr, nullptr, nullptr);
 
-  const char *insertSessionSQL = 
-      "INSERT OR IGNORE INTO sessions "
-      "(session_id, started_at, grade_level, topic, total_questions, "
-      "correct_answers, score_percentage) "
-      "VALUES (?, ?, ?, ?, ?, ?, ?);";
+  const char *insertSessionSQL = "INSERT OR IGNORE INTO sessions "
+                                 "(session_id, started_at, grade_level, topic, total_questions, "
+                                 "correct_answers, score_percentage) "
+                                 "VALUES (?, ?, ?, ?, ?, ?, ?);";
 
   sqlite3_stmt *preparedStatement = nullptr;
   if (sqlite3_prepare_v2(database, insertSessionSQL, -1, &preparedStatement, nullptr) ==
@@ -142,10 +141,9 @@ void QuestionBank::saveSessionResults(const std::string &sessionId, int gradeLev
     sqlite3_finalize(preparedStatement);
   }
 
-  const char *insertAnswerSQL = 
-      "INSERT INTO session_answers "
-      "(session_id, question_id, topic, grade_level, was_correct) "
-      "VALUES (?, ?, ?, ?, ?);";
+  const char *insertAnswerSQL = "INSERT INTO session_answers "
+                                "(session_id, question_id, topic, grade_level, was_correct) "
+                                "VALUES (?, ?, ?, ?, ?);";
 
   for (const auto &answeredQuestion : answeredQuestions) {
     if (sqlite3_prepare_v2(database, insertAnswerSQL, -1, &preparedStatement, nullptr) ==

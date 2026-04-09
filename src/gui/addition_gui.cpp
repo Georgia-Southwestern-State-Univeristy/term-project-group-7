@@ -163,12 +163,10 @@ LRESULT CALLBACK QuizWindowMessageHandler(HWND windowHandle, UINT message, WPARA
         CreateFont(22, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS,
                    CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, VARIABLE_PITCH, TEXT("Arial"));
 
-    quizState->progressLabel = 
-        CreateWindow("STATIC", "", WS_VISIBLE | WS_CHILD, 20, 14, 580, 26,
+    quizState->progressLabel = CreateWindow("STATIC", "", WS_VISIBLE | WS_CHILD, 20, 14, 580, 26,
                                             windowHandle, NULL, NULL, NULL);
 
-    quizState->questionLabel = 
-        CreateWindow("STATIC", "", WS_VISIBLE | WS_CHILD | SS_LEFT, 20, 55,
+    quizState->questionLabel = CreateWindow("STATIC", "", WS_VISIBLE | WS_CHILD | SS_LEFT, 20, 55,
                                             580, 80, windowHandle, NULL, NULL, NULL);
 
     CreateWindow("STATIC", "Your answer:", WS_VISIBLE | WS_CHILD, 20, 152, 130, 26, windowHandle,
@@ -185,8 +183,7 @@ LRESULT CALLBACK QuizWindowMessageHandler(HWND windowHandle, UINT message, WPARA
     CreateWindow("BUTTON", "Back", WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON, 160, 200, 120, 38,
                  windowHandle, (HMENU)(UINT_PTR)BACK_BUTTON_ID, GetModuleHandle(NULL), NULL);
 
-    quizState->resultLabel = 
-        CreateWindow("STATIC", "", WS_VISIBLE | WS_CHILD, 20, 254, 580, 26,
+    quizState->resultLabel = CreateWindow("STATIC", "", WS_VISIBLE | WS_CHILD, 20, 254, 580, 26,
                                           windowHandle, NULL, NULL, NULL);
 
     quizState->explanationBox = CreateWindow("EDIT", "",
