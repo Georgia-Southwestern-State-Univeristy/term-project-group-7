@@ -1,21 +1,25 @@
 # Week 9 PR Index
 
 ## PR 1
-**PR Link:** (PR LINK PENDING)
-**Backlog Item:** Add request logging for key API actions  
-**Impact:** Adds basic observability for the main MVP API workflow so requests can be traced during testing and demos.
+**PR Link:** https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/1  
+**Backlog Item:** Add structured logs for key API actions  
+**Linked Issues:** #3, #4  
+**Review Status:** Approved  
+**CI Status:** Passing  
+**Impact:** Adds request visibility for Beta testing so the team can trace successful API calls in the terminal.
 
 ## PR 2
-**PR Link:** (PR LINK PENDING)
-**Backlog Item:** Improve invalid input error messages and structured error logs  
-**Impact:** Makes common failure cases easier to understand and reduces time spent debugging invalid requests.
+**PR Link:** https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/2  
+**Backlog Item:** Improve error messages and structured error logs  
+**Linked Issues:** #1, #5, #6  
+**Review Status:** Approved  
+**CI Status:** Passing  
+**Impact:** Makes common failures easier to understand and diagnose during Beta testing.
 
 ## PR 3
-**PR Link:** (PR LINK PENDING)
-**Backlog Item:** Fix bugs and add regression tests  
-**Impact:** Prevents known failures from returning by capturing the expected behavior in automated tests.
-
-## Notes
-- Each PR should be small and focused
-- Each PR should have review approval and CI passing before merge
-- Replace each placeholder with the real GitHub PR link before submission
+**PR Link:** https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/3  
+**Backlog Item:** Add regression tests for fixed bugs  
+**Linked Issues:** #2  
+**Review Status:** Approved  
+**CI Status:** Passing  
+**Impact:** Protects known bug fixes from silently breaking later.

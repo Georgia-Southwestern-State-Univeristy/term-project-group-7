@@ -108,14 +108,3 @@ if (WIN32)
   target_link_libraries(test_boundary_score_70_cutoff PRIVATE ws2_32)
 endif()
 add_test(NAME boundary_score_70_cutoff COMMAND test_boundary_score_70_cutoff)
- 
-# --- Database ---
-add_library(sqlite3
-    ${CMAKE_SOURCE_DIR}/database/sqlite/sqlite3.c
-)
- 
-target_include_directories(sqlite3 PUBLIC
-    ${CMAKE_SOURCE_DIR}/database/sqlite
-)
- 
-target_link_libraries(server PRIVATE sqlite3)
