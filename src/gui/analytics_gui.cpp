@@ -1,18 +1,132 @@
-#include "gui/addition_gui.h"
+#include "gui/main_menu_gui.h"
 
+#include <ctime>
 #include <iomanip>
 #include <sstream>
 #include <string>
+
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <cmath>
 
 #include "../../database/sqlite/sqlite3.h"
+
+#define ANALYTICS_THEME_BUTTON_ID 301
+#define ANALYTICS_REFRESH_BUTTON_ID 302
+
+struct AnalyticsWindowState {
+  bool darkModeEnabled;
+  HWND reportTextBox;
+  HWND themeButton;
+  HWND refreshButton;
+  HBRUSH backgroundBrush;
+  HBRUSH panelBrush;
+  HBRUSH editBrush;
+};
+
+static COLORREF GetBackgroundColor(bool darkModeEnabled) {
+  return darkModeEnabled ? RGB(30, 30, 30) : RGB(245, 245, 245);
+}
+
+static COLORREF GetPanelColor(bool darkModeEnabled) {
+  return darkModeEnabled ? RGB(55, 55, 58) : RGB(235, 235, 235);
+}
+
+static COLORREF GetEditColor(bool darkModeEnabled) {
+  return darkModeEnabled ? RGB(37, 37, 38) : RGB(255, 255, 255);
+}
+
+static COLORREF GetTextColor(bool darkModeEnabled) {
+  return darkModeEnabled ? RGB(235, 235, 235) : RGB(20, 20, 20);
+}
+
+static void RefreshAnalyticsBrushes(AnalyticsWindowState *windowState) {
+  if (!windowState)
+    return;
+
+  if (windowState->backgroundBrush)
+    DeleteObject(windowState->backgroundBrush);
+  if (windowState->panelBrush)
+    DeleteObject(windowState->panelBrush);
+  if (windowState->editBrush)
+    DeleteObject(windowState->editBrush);
+
+  windowState->backgroundBrush =
+      CreateSolidBrush(GetBackgroundColor(windowState->darkModeEnabled));
+  windowState->panelBrush =
+      CreateSolidBrush(GetPanelColor(windowState->darkModeEnabled));
+  windowState->editBrush =
+      CreateSolidBrush(GetEditColor(windowState->darkModeEnabled));
+}
+
+static void DrawThemeToggleIcon(HDC deviceContext, RECT rect, bool darkModeEnabled) {
+  COLORREF iconColor = darkModeEnabled ? RGB(250, 250, 250) : RGB(30, 30, 30);
+
+  int width = rect.right - rect.left;
+  int height = rect.bottom - rect.top;
+  int centerX = rect.left + width / 2;
+  int centerY = rect.top + height / 2;
+
+  HBRUSH iconBrush = CreateSolidBrush(iconColor);
+  HBRUSH backgroundBrush = CreateSolidBrush(GetPanelColor(darkModeEnabled));
+  HPEN pen = CreatePen(PS_SOLID, 1, iconColor);
+
+  HGDIOBJ oldBrush = SelectObject(deviceContext, iconBrush);
+  HGDIOBJ oldPen = SelectObject(deviceContext, pen);
+
+  if (!darkModeEnabled) {
+    int sunRadius = min(width, height) / 6;
+
+    Ellipse(deviceContext, centerX - sunRadius, centerY - sunRadius,
+            centerX + sunRadius, centerY + sunRadius);
+
+    const int rayLength = sunRadius + 8;
+    const int rayInner = sunRadius + 3;
+
+    for (int i = 0; i < 8; i++) {
+      double angle = (3.14159265358979323846 / 4.0) * i;
+      int x1 = centerX + (int)(cos(angle) * rayInner);
+      int y1 = centerY + (int)(sin(angle) * rayInner);
+      int x2 = centerX + (int)(cos(angle) * rayLength);
+      int y2 = centerY + (int)(sin(angle) * rayLength);
+
+      MoveToEx(deviceContext, x1, y1, NULL);
+      LineTo(deviceContext, x2, y2);
+    }
+  } else {
+    int moonRadius = min(width, height) / 4;
+
+    Ellipse(deviceContext, centerX - moonRadius, centerY - moonRadius,
+            centerX + moonRadius, centerY + moonRadius);
+
+    SelectObject(deviceContext, backgroundBrush);
+    SelectObject(deviceContext, GetStockObject(NULL_PEN));
+
+    int cutOffsetX = moonRadius / 2;
+    int cutOffsetY = moonRadius / 5;
+
+    Ellipse(deviceContext,
+            centerX - moonRadius + cutOffsetX,
+            centerY - moonRadius - cutOffsetY,
+            centerX + moonRadius + cutOffsetX,
+            centerY + moonRadius - cutOffsetY);
+  }
+
+  SelectObject(deviceContext, oldBrush);
+  SelectObject(deviceContext, oldPen);
+
+  DeleteObject(iconBrush);
+  DeleteObject(backgroundBrush);
+  DeleteObject(pen);
+}
 
 static std::string GetPathToDatabase() {
   char pathToExecutable[MAX_PATH] = {};
   GetModuleFileNameA(NULL, pathToExecutable, MAX_PATH);
   std::string fullPath(pathToExecutable);
   auto lastSlash = fullPath.find_last_of("\\/");
-  return (lastSlash != std::string::npos ? fullPath.substr(0, lastSlash + 1) : "") + "questions.db";
+  return (lastSlash != std::string::npos ? fullPath.substr(0, lastSlash + 1) : "") +
+         "questions.db";
 }
 
 static std::string BuildAnalyticsReportText(sqlite3 *database) {
@@ -57,14 +171,15 @@ static std::string BuildAnalyticsReportText(sqlite3 *database) {
   report << "\r\n";
 
   {
-    const char *breakdownBySubjectSQL = "SELECT "
-                                        "    topic, "
-                                        "    SUM(correct_answers)                   AS correct, "
-                                        "    SUM(total_questions - correct_answers) AS incorrect, "
-                                        "    SUM(total_questions)                   AS total "
-                                        "FROM sessions "
-                                        "GROUP BY LOWER(topic) "
-                                        "ORDER BY LOWER(topic);";
+    const char *breakdownBySubjectSQL =
+        "SELECT "
+        "    topic, "
+        "    SUM(correct_answers)                   AS correct, "
+        "    SUM(total_questions - correct_answers) AS incorrect, "
+        "    SUM(total_questions)                   AS total "
+        "FROM sessions "
+        "GROUP BY LOWER(topic) "
+        "ORDER BY LOWER(topic);";
 
     sqlite3_stmt *preparedStatement = nullptr;
     sqlite3_prepare_v2(database, breakdownBySubjectSQL, -1, &preparedStatement, nullptr);
@@ -100,14 +215,15 @@ static std::string BuildAnalyticsReportText(sqlite3 *database) {
   report << "\r\n";
 
   {
-    const char *breakdownByGradeSQL = "SELECT "
-                                      "    grade_level, "
-                                      "    SUM(correct_answers)                   AS correct, "
-                                      "    SUM(total_questions - correct_answers) AS incorrect, "
-                                      "    SUM(total_questions)                   AS total "
-                                      "FROM sessions "
-                                      "GROUP BY grade_level "
-                                      "ORDER BY grade_level;";
+    const char *breakdownByGradeSQL =
+        "SELECT "
+        "    grade_level, "
+        "    SUM(correct_answers)                   AS correct, "
+        "    SUM(total_questions - correct_answers) AS incorrect, "
+        "    SUM(total_questions)                   AS total "
+        "FROM sessions "
+        "GROUP BY grade_level "
+        "ORDER BY grade_level;";
 
     sqlite3_stmt *preparedStatement = nullptr;
     sqlite3_prepare_v2(database, breakdownByGradeSQL, -1, &preparedStatement, nullptr);
@@ -183,33 +299,192 @@ static std::string BuildAnalyticsReportText(sqlite3 *database) {
   return report.str();
 }
 
+static void RefreshAnalyticsReport(AnalyticsWindowState *windowState) {
+  if (!windowState || !windowState->reportTextBox)
+    return;
+
+  int firstVisibleLine = (int)SendMessage(windowState->reportTextBox, EM_GETFIRSTVISIBLELINE, 0, 0);
+
+  sqlite3 *database = nullptr;
+  sqlite3_open(GetPathToDatabase().c_str(), &database);
+  std::string reportText = BuildAnalyticsReportText(database);
+  if (database)
+    sqlite3_close(database);
+
+  SetWindowText(windowState->reportTextBox, reportText.c_str());
+  SendMessage(windowState->reportTextBox, EM_LINESCROLL, 0, firstVisibleLine);
+}
+
+static void ApplyAnalyticsTheme(HWND windowHandle, AnalyticsWindowState *windowState) {
+  if (!windowState)
+    return;
+
+  windowState->darkModeEnabled = IsDarkModeEnabled();
+  RefreshAnalyticsBrushes(windowState);
+
+  InvalidateRect(windowHandle, NULL, TRUE);
+  UpdateWindow(windowHandle);
+}
+
+static void DrawAnalyticsButton(const DRAWITEMSTRUCT *drawItem, bool darkModeEnabled, bool themeButton) {
+  COLORREF fillColor = darkModeEnabled ? RGB(55, 55, 58) : RGB(235, 235, 235);
+  COLORREF borderColor = darkModeEnabled ? RGB(140, 140, 140) : RGB(150, 150, 150);
+  COLORREF textColor = GetTextColor(darkModeEnabled);
+
+  HBRUSH fillBrush = CreateSolidBrush(fillColor);
+  FillRect(drawItem->hDC, &drawItem->rcItem, fillBrush);
+  DeleteObject(fillBrush);
+
+  HPEN borderPen = CreatePen(PS_SOLID, 1, borderColor);
+  HGDIOBJ oldPen = SelectObject(drawItem->hDC, borderPen);
+  HGDIOBJ oldBrush = SelectObject(drawItem->hDC, GetStockObject(NULL_BRUSH));
+  Rectangle(drawItem->hDC, drawItem->rcItem.left, drawItem->rcItem.top,
+            drawItem->rcItem.right, drawItem->rcItem.bottom);
+  SelectObject(drawItem->hDC, oldBrush);
+  SelectObject(drawItem->hDC, oldPen);
+  DeleteObject(borderPen);
+
+  if (themeButton) {
+    DrawThemeToggleIcon(drawItem->hDC, drawItem->rcItem, darkModeEnabled);
+    return;
+  }
+
+  SetBkMode(drawItem->hDC, TRANSPARENT);
+  SetTextColor(drawItem->hDC, textColor);
+
+  wchar_t buttonText[64] = {};
+  GetWindowTextW(drawItem->hwndItem, buttonText, 64);
+  DrawTextW(drawItem->hDC, buttonText, -1,
+            const_cast<RECT *>(&drawItem->rcItem),
+            DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+}
+
 LRESULT CALLBACK AnalyticsWindowMessageHandler(HWND windowHandle, UINT message, WPARAM wParam,
                                                LPARAM lParam) {
+  AnalyticsWindowState *windowState =
+      reinterpret_cast<AnalyticsWindowState *>(
+          GetWindowLongPtr(windowHandle, GWLP_USERDATA));
+
   switch (message) {
 
   case WM_CREATE: {
+    windowState = new AnalyticsWindowState();
+    windowState->darkModeEnabled = IsDarkModeEnabled();
+    windowState->reportTextBox = NULL;
+    windowState->themeButton = NULL;
+    windowState->refreshButton = NULL;
+    windowState->backgroundBrush = NULL;
+    windowState->panelBrush = NULL;
+    windowState->editBrush = NULL;
+
+    SetWindowLongPtr(windowHandle, GWLP_USERDATA,
+                     reinterpret_cast<LONG_PTR>(windowState));
+    RefreshAnalyticsBrushes(windowState);
+
     HFONT monospaceFont =
-        CreateFont(20, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS,
-                   CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, FIXED_PITCH, TEXT("Courier New"));
+        CreateFont(20, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+                   OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
+                   FIXED_PITCH, TEXT("Courier New"));
 
-    HWND reportTextBox = CreateWindow("EDIT", "",
-                                      WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | WS_HSCROLL |
-                                          ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL,
-                                      10, 10, 740, 520, windowHandle, NULL, NULL, NULL);
+    windowState->refreshButton =
+        CreateWindow("BUTTON", "Refresh",
+                     WS_VISIBLE | WS_CHILD | BS_OWNERDRAW,
+                     620, 10, 75, 36, windowHandle,
+                     (HMENU)(UINT_PTR)ANALYTICS_REFRESH_BUTTON_ID, NULL, NULL);
 
-    SendMessage(reportTextBox, WM_SETFONT, (WPARAM)monospaceFont, TRUE);
+    windowState->themeButton =
+        CreateWindowW(L"BUTTON", L"",
+                      WS_VISIBLE | WS_CHILD | BS_OWNERDRAW,
+                      700, 10, 50, 36, windowHandle,
+                      (HMENU)(UINT_PTR)ANALYTICS_THEME_BUTTON_ID, NULL, NULL);
 
-    sqlite3 *database = nullptr;
-    sqlite3_open(GetPathToDatabase().c_str(), &database);
-    std::string reportText = BuildAnalyticsReportText(database);
-    if (database)
-      sqlite3_close(database);
+    windowState->reportTextBox =
+        CreateWindow("EDIT", "",
+                     WS_VISIBLE | WS_CHILD | WS_BORDER | WS_VSCROLL | WS_HSCROLL |
+                         ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL,
+                     10, 55, 740, 475, windowHandle, NULL, NULL, NULL);
 
-    SetWindowText(reportTextBox, reportText.c_str());
+    SendMessage(windowState->themeButton, WM_SETFONT, (WPARAM)monospaceFont, TRUE);
+    SendMessage(windowState->refreshButton, WM_SETFONT, (WPARAM)monospaceFont, TRUE);
+    SendMessage(windowState->reportTextBox, WM_SETFONT, (WPARAM)monospaceFont, TRUE);
+
+    RefreshAnalyticsReport(windowState);
     break;
   }
 
+  case WM_SIZE:
+    if (windowState) {
+      int clientWidth = LOWORD(lParam);
+      int clientHeight = HIWORD(lParam);
+
+      MoveWindow(windowState->refreshButton, clientWidth - 160, 10, 75, 36, TRUE);
+      MoveWindow(windowState->themeButton, clientWidth - 80, 10, 50, 36, TRUE);
+      MoveWindow(windowState->reportTextBox, 10, 55, clientWidth - 20, clientHeight - 65, TRUE);
+    }
+    return 0;
+
+  case WM_COMMAND:
+    if (windowState && LOWORD(wParam) == ANALYTICS_THEME_BUTTON_ID) {
+      ToggleDarkModeEnabled();
+    }
+    if (windowState && LOWORD(wParam) == ANALYTICS_REFRESH_BUTTON_ID) {
+      RefreshAnalyticsReport(windowState);
+    }
+    return 0;
+
+  case WM_DRAWITEM:
+    if (windowState) {
+      const DRAWITEMSTRUCT *drawItem =
+          reinterpret_cast<DRAWITEMSTRUCT *>(lParam);
+      bool isThemeButton = (drawItem->CtlID == ANALYTICS_THEME_BUTTON_ID);
+      DrawAnalyticsButton(drawItem, windowState->darkModeEnabled, isThemeButton);
+      return TRUE;
+    }
+    break;
+
+  case WM_CTLCOLORSTATIC:
+    if (windowState) {
+      HDC deviceContext = reinterpret_cast<HDC>(wParam);
+      SetTextColor(deviceContext, GetTextColor(windowState->darkModeEnabled));
+      SetBkColor(deviceContext, GetBackgroundColor(windowState->darkModeEnabled));
+      return reinterpret_cast<INT_PTR>(windowState->backgroundBrush);
+    }
+    break;
+
+  case WM_CTLCOLOREDIT:
+    if (windowState) {
+      HDC deviceContext = reinterpret_cast<HDC>(wParam);
+      SetTextColor(deviceContext, GetTextColor(windowState->darkModeEnabled));
+      SetBkColor(deviceContext, GetEditColor(windowState->darkModeEnabled));
+      return reinterpret_cast<INT_PTR>(windowState->editBrush);
+    }
+    break;
+
+  case WM_ERASEBKGND:
+    if (windowState) {
+      RECT clientArea;
+      GetClientRect(windowHandle, &clientArea);
+      FillRect(reinterpret_cast<HDC>(wParam), &clientArea, windowState->backgroundBrush);
+      return 1;
+    }
+    break;
+
+  case WM_APP_THEME_CHANGED:
+    if (windowState) {
+      ApplyAnalyticsTheme(windowHandle, windowState);
+    }
+    return 0;
+
   case WM_DESTROY:
+    if (windowState) {
+      if (windowState->backgroundBrush)
+        DeleteObject(windowState->backgroundBrush);
+      if (windowState->panelBrush)
+        DeleteObject(windowState->panelBrush);
+      if (windowState->editBrush)
+        DeleteObject(windowState->editBrush);
+      delete windowState;
+    }
     return 0;
   }
 
@@ -230,11 +505,13 @@ void ShowAnalyticsWindow(HWND parentWindow) {
 
   HWND analyticsWindow =
       CreateWindowEx(0, "AnalyticsWindowClass", "Analytics",
-                     WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX, CW_USEDEFAULT,
-                     CW_USEDEFAULT, 780, 600, parentWindow, NULL, GetModuleHandle(NULL), NULL);
+                     WS_OVERLAPPEDWINDOW,
+                     CW_USEDEFAULT, CW_USEDEFAULT, 780, 600, parentWindow, NULL,
+                     GetModuleHandle(NULL), NULL);
 
   if (!analyticsWindow)
     return;
+
   ShowWindow(analyticsWindow, SW_SHOW);
   UpdateWindow(analyticsWindow);
 }

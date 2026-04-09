@@ -32,19 +32,19 @@ void QuestionBank::createAnalyticsTablesIfMissing() {
     return;
 
   const char *createTablesSQL = "CREATE TABLE IF NOT EXISTS sessions ("
-                                "    session_id   TEXT    PRIMARY KEY,"
-                                "    started_at   INTEGER NOT NULL,"
-                                "    grade_level  INTEGER NOT NULL,"
-                                "    topic        TEXT    NOT NULL,"
+                                "    session_id       TEXT PRIMARY KEY,"
+                                "    started_at       INTEGER NOT NULL,"
+                                "    grade_level      INTEGER NOT NULL,"
+                                "    topic            TEXT NOT NULL,"
                                 "    total_questions  INTEGER NOT NULL,"
                                 "    correct_answers  INTEGER NOT NULL,"
-                                "    score_percentage REAL    NOT NULL"
+                                "    score_percentage REAL NOT NULL"
                                 ");"
                                 "CREATE TABLE IF NOT EXISTS session_answers ("
                                 "    id           INTEGER PRIMARY KEY AUTOINCREMENT,"
-                                "    session_id   TEXT    NOT NULL REFERENCES sessions(session_id),"
+                                "    session_id   TEXT NOT NULL REFERENCES sessions(session_id),"
                                 "    question_id  INTEGER NOT NULL,"
-                                "    topic        TEXT    NOT NULL,"
+                                "    topic        TEXT NOT NULL,"
                                 "    grade_level  INTEGER NOT NULL,"
                                 "    was_correct  INTEGER NOT NULL"
                                 ");";
@@ -91,7 +91,7 @@ std::vector<Question> QuestionBank::getRandomQuestions(int numberOfQuestions, in
         reinterpret_cast<const char *>(sqlite3_column_text(preparedStatement, 3));
     question.questionText = questionText ? questionText : "";
 
-    question.correctAnswer = static_cast<int>(sqlite3_column_double(preparedStatement, 4));
+    question.correctAnswer = sqlite3_column_int(preparedStatement, 4);
 
     const char *explanationText =
         reinterpret_cast<const char *>(sqlite3_column_text(preparedStatement, 5));
@@ -110,25 +110,34 @@ void QuestionBank::saveSessionResults(const std::string &sessionId, int gradeLev
   if (!database || answeredQuestions.empty())
     return;
 
-  int totalQuestions = (int)answeredQuestions.size();
+  int totalQuestions = static_cast<int>(answeredQuestions.size());
   int correctAnswers = 0;
 
-  for (const auto &answeredQuestion : answeredQuestions)
-    if (answeredQuestion.wasCorrect)
+  for (const auto &answeredQuestion : answeredQuestions) {
+    if (answeredQuestion.wasCorrect) {
       correctAnswers++;
+    }
+  }
 
   double scorePercentage = totalQuestions > 0 ? (correctAnswers * 100.0 / totalQuestions) : 0.0;
-  long long timeSessionStarted = (long long)time(nullptr);
+  long long timeSessionStarted = static_cast<long long>(time(nullptr));
 
   sqlite3_exec(database, "BEGIN;", nullptr, nullptr, nullptr);
 
-  const char *insertSessionSQL = "INSERT OR IGNORE INTO sessions "
+  const char *upsertSessionSQL = "INSERT INTO sessions "
                                  "(session_id, started_at, grade_level, topic, total_questions, "
-                                 "correct_answers, score_percentage) "
-                                 "VALUES (?, ?, ?, ?, ?, ?, ?);";
+                                 " correct_answers, score_percentage) "
+                                 "VALUES (?, ?, ?, ?, ?, ?, ?) "
+                                 "ON CONFLICT(session_id) DO UPDATE SET "
+                                 "  started_at = excluded.started_at, "
+                                 "  grade_level = excluded.grade_level, "
+                                 "  topic = excluded.topic, "
+                                 "  total_questions = excluded.total_questions, "
+                                 "  correct_answers = excluded.correct_answers, "
+                                 "  score_percentage = excluded.score_percentage;";
 
   sqlite3_stmt *preparedStatement = nullptr;
-  if (sqlite3_prepare_v2(database, insertSessionSQL, -1, &preparedStatement, nullptr) ==
+  if (sqlite3_prepare_v2(database, upsertSessionSQL, -1, &preparedStatement, nullptr) ==
       SQLITE_OK) {
     sqlite3_bind_text(preparedStatement, 1, sessionId.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_int64(preparedStatement, 2, timeSessionStarted);
@@ -137,6 +146,14 @@ void QuestionBank::saveSessionResults(const std::string &sessionId, int gradeLev
     sqlite3_bind_int(preparedStatement, 5, totalQuestions);
     sqlite3_bind_int(preparedStatement, 6, correctAnswers);
     sqlite3_bind_double(preparedStatement, 7, scorePercentage);
+    sqlite3_step(preparedStatement);
+    sqlite3_finalize(preparedStatement);
+  }
+
+  const char *deleteOldAnswersSQL = "DELETE FROM session_answers WHERE session_id = ?;";
+  if (sqlite3_prepare_v2(database, deleteOldAnswersSQL, -1, &preparedStatement, nullptr) ==
+      SQLITE_OK) {
+    sqlite3_bind_text(preparedStatement, 1, sessionId.c_str(), -1, SQLITE_STATIC);
     sqlite3_step(preparedStatement);
     sqlite3_finalize(preparedStatement);
   }

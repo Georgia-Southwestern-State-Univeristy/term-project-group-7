@@ -3,18 +3,19 @@
 #include "gui/question_bank.h"
 
 #include <cctype>
+#include <commctrl.h>
+#include <cstring>
 #include <ctime>
+#include <richedit.h>
 #include <sstream>
 #include <string>
 #include <vector>
 
 #define WIN32_LEAN_AND_MEAN
-#include <cmath>
-#include <richedit.h>
 #include <windows.h>
 
 #define SUBMIT_BUTTON_ID 201
-#define BACK_BUTTON_ID 202
+#define HOME_BUTTON_ID 202
 #define HINT_BUTTON_ID 203
 #define THEME_BUTTON_ID 204
 
@@ -28,13 +29,14 @@ struct QuizWindowState {
   std::string sessionId;
   bool waitingForNextClick;
   bool darkModeEnabled;
+  bool showError;
 
   HWND progressLabel;
   HWND questionLabel;
   HWND answerLabel;
   HWND answerInputBox;
   HWND submitButton;
-  HWND backButton;
+  HWND homeButton;
   HWND hintButton;
   HWND themeButton;
   HWND resultLabel;
@@ -59,10 +61,6 @@ static COLORREF GetEditColor(bool darkModeEnabled) {
 
 static COLORREF GetTextColor(bool darkModeEnabled) {
   return darkModeEnabled ? RGB(235, 235, 235) : RGB(20, 20, 20);
-}
-
-static COLORREF GetBackButtonColor(bool darkModeEnabled) {
-  return darkModeEnabled ? RGB(110, 110, 110) : RGB(215, 215, 215);
 }
 
 static COLORREF GetSubmitButtonColor(bool darkModeEnabled) {
@@ -189,6 +187,60 @@ static void DrawThemeToggleIcon(HDC deviceContext, RECT rect, bool darkModeEnabl
   DeleteObject(iconBrush);
   DeleteObject(backgroundBrush);
   DeleteObject(pen);
+}
+
+static void DrawHomeIcon(HDC deviceContext, RECT rect, bool darkModeEnabled) {
+  COLORREF iconColor = darkModeEnabled ? RGB(250, 250, 250) : RGB(20, 20, 20);
+  COLORREF cutColor = GetPanelColor(darkModeEnabled);
+
+  const int centerX = (rect.left + rect.right) / 2;
+  const int centerY = (rect.top + rect.bottom) / 2;
+
+  const int iconWidth = 26;
+  const int iconHeight = 22;
+
+  const int left = centerX - iconWidth / 2;
+  const int right = centerX + iconWidth / 2;
+  const int top = centerY - iconHeight / 2;
+  const int bottom = centerY + iconHeight / 2;
+
+  const int roofPeakY = top;
+  const int roofBaseY = top + 9;
+
+  const int bodyLeftX = centerX - 9;
+  const int bodyRightX = centerX + 9;
+  const int bodyTopY = roofBaseY - 1;
+  const int bodyBottomY = bottom;
+
+  const int doorLeftX = centerX - 3;
+  const int doorRightX = centerX + 3;
+  const int doorTopY = bottom - 8;
+
+  HBRUSH iconBrush = CreateSolidBrush(iconColor);
+  HBRUSH cutBrush = CreateSolidBrush(cutColor);
+  HPEN iconPen = CreatePen(PS_SOLID, 1, iconColor);
+
+  HGDIOBJ oldBrush = SelectObject(deviceContext, iconBrush);
+  HGDIOBJ oldPen = SelectObject(deviceContext, iconPen);
+
+  POINT roof[3];
+  roof[0] = {centerX, roofPeakY};
+  roof[1] = {left, roofBaseY};
+  roof[2] = {right, roofBaseY};
+  Polygon(deviceContext, roof, 3);
+
+  Rectangle(deviceContext, bodyLeftX, bodyTopY, bodyRightX, bodyBottomY);
+
+  SelectObject(deviceContext, cutBrush);
+  SelectObject(deviceContext, GetStockObject(NULL_PEN));
+  Rectangle(deviceContext, doorLeftX, doorTopY, doorRightX, bodyBottomY);
+
+  SelectObject(deviceContext, oldBrush);
+  SelectObject(deviceContext, oldPen);
+
+  DeleteObject(iconBrush);
+  DeleteObject(cutBrush);
+  DeleteObject(iconPen);
 }
 
 static std::string BuildHintText(const Question &question) {
@@ -375,7 +427,7 @@ static void ShowWrongAnswerSteps(QuizWindowState *quizState, const Question &cur
 
   std::wstring correctAnswerLine =
       L"Correct answer: " + std::to_wstring(currentQuestion.correctAnswer) + L"\r\n\r\n";
-  AppendRichText(quizState->explanationBox, correctAnswerLine, RGB(220, 70, 70), true);
+  AppendRichText(quizState->explanationBox, correctAnswerLine, RGB(255, 80, 80), true);
 
   std::string fullText = BuildStepByStepSolution(currentQuestion);
   std::string prefix =
@@ -391,8 +443,8 @@ static void ShowWrongAnswerSteps(QuizWindowState *quizState, const Question &cur
 static void ShowSavedMessage(QuizWindowState *quizState) {
   ClearRichText(quizState->explanationBox);
   AppendRichText(quizState->explanationBox,
-                 L"Your results were saved. Press Back to return to the menu.", RGB(80, 180, 80),
-                 true);
+                 L"Your results were saved. Press the Home icon to return to the menu.",
+                 RGB(80, 180, 80), true);
 }
 
 static void LayoutQuizControls(HWND windowHandle, QuizWindowState *quizState) {
@@ -405,29 +457,45 @@ static void LayoutQuizControls(HWND windowHandle, QuizWindowState *quizState) {
   int clientWidth = clientRect.right - clientRect.left;
   int clientHeight = clientRect.bottom - clientRect.top;
 
-  if (clientWidth < 760)
-    clientWidth = 760;
-  if (clientHeight < 560)
-    clientHeight = 560;
+  if (clientWidth < 900)
+    clientWidth = 900;
+  if (clientHeight < 700)
+    clientHeight = 700;
 
-  const int contentWidth = 700;
+  const int buttonW = 65;
+  const int buttonH = 38;
+  const int outerMargin = 24;
+
+  MoveWindow(quizState->homeButton, outerMargin, 18, buttonW, buttonH, TRUE);
+  MoveWindow(quizState->themeButton, clientRect.right - outerMargin - buttonW, 18, buttonW, buttonH,
+             TRUE);
+
+  const int contentWidth = 760;
   int leftX = (clientWidth - contentWidth) / 2;
-  if (leftX < 25)
-    leftX = 25;
+  if (leftX < 60)
+    leftX = 60;
 
-  MoveWindow(quizState->progressLabel, leftX, 18, 520, 28, TRUE);
-  MoveWindow(quizState->themeButton, clientRect.right - 95, 14, 65, 38, TRUE);
-  MoveWindow(quizState->questionLabel, leftX, 62, contentWidth, 58, TRUE);
+  const int progressY = 96;
+  const int questionY = 138;
+  const int answerY = 195;
+  const int buttonY = 245;
+  const int resultY = 288;
+  const int explanationY = 315;
+  int explanationHeight = clientHeight - explanationY - 20;
+  if (explanationHeight < 260)
+    explanationHeight = 260;
 
-  MoveWindow(quizState->answerLabel, leftX, 145, 120, 24, TRUE);
-  MoveWindow(quizState->answerInputBox, leftX + 125, 142, 130, 30, TRUE);
+  MoveWindow(quizState->progressLabel, leftX, progressY, 520, 28, TRUE);
+  MoveWindow(quizState->questionLabel, leftX, questionY, contentWidth, 48, TRUE);
 
-  MoveWindow(quizState->backButton, leftX, 195, 120, 40, TRUE);
-  MoveWindow(quizState->submitButton, leftX + (contentWidth / 2) - 60, 195, 120, 40, TRUE);
-  MoveWindow(quizState->hintButton, leftX + contentWidth - 120, 195, 120, 40, TRUE);
+  MoveWindow(quizState->answerLabel, leftX, answerY, 120, 24, TRUE);
+  MoveWindow(quizState->answerInputBox, leftX + 125, answerY - 4, 130, 30, TRUE);
 
-  MoveWindow(quizState->resultLabel, leftX, 252, contentWidth, 24, TRUE);
-  MoveWindow(quizState->explanationBox, leftX, 285, contentWidth, clientHeight - 325, TRUE);
+  MoveWindow(quizState->submitButton, leftX + (contentWidth / 2) - 60, buttonY, 120, 40, TRUE);
+  MoveWindow(quizState->hintButton, leftX + contentWidth - 120, buttonY, 120, 40, TRUE);
+
+  MoveWindow(quizState->resultLabel, leftX, resultY, contentWidth, 24, TRUE);
+  MoveWindow(quizState->explanationBox, leftX, explanationY, contentWidth, explanationHeight, TRUE);
 }
 
 static void DisplayCurrentQuestion(QuizWindowState *quizState) {
@@ -448,6 +516,7 @@ static void DisplayCurrentQuestion(QuizWindowState *quizState) {
   SetWindowText(quizState->questionLabel, currentQuestion.questionText.c_str());
   SetWindowText(quizState->answerInputBox, "");
   SetWindowText(quizState->resultLabel, "");
+  quizState->showError = false;
   ShowExplanationDefault(quizState);
   SetButtonToSubmitMode(quizState);
   SetFocus(quizState->answerInputBox);
@@ -474,6 +543,7 @@ static void SaveAndShowFinalScore(QuizWindowState *quizState) {
   SetWindowText(quizState->progressLabel, "");
   SetWindowText(quizState->answerInputBox, "");
   SetWindowText(quizState->resultLabel, "");
+  quizState->showError = false;
   ShowSavedMessage(quizState);
   EnableWindow(quizState->submitButton, FALSE);
   EnableWindow(quizState->hintButton, FALSE);
@@ -510,9 +580,12 @@ static void HandleSubmitButtonPressed(QuizWindowState *quizState) {
   GetWindowText(quizState->answerInputBox, userTypedAnswer, 64);
 
   if (userTypedAnswer[0] == '\0') {
-    SetWindowText(quizState->resultLabel, "Please type an answer first.");
+    quizState->showError = true;
+    SetWindowText(quizState->resultLabel, "Input an answer before submitting");
     return;
   }
+
+  quizState->showError = false;
 
   int userAnswer = atoi(userTypedAnswer);
   const Question &currentQuestion = quizState->questionList[quizState->currentQuestionIndex];
@@ -545,9 +618,22 @@ static void HandleSubmitButtonPressed(QuizWindowState *quizState) {
   }
 }
 
+static LRESULT CALLBACK AnswerEditSubclassProc(HWND editHandle, UINT message, WPARAM wParam,
+                                               LPARAM lParam, UINT_PTR, DWORD_PTR) {
+  if (message == WM_KEYDOWN && wParam == VK_RETURN) {
+    HWND parentWindow = GetParent(editHandle);
+    if (parentWindow) {
+      SendMessage(parentWindow, WM_COMMAND, MAKEWPARAM(SUBMIT_BUTTON_ID, BN_CLICKED), 0);
+    }
+    return 0;
+  }
+
+  return DefSubclassProc(editHandle, message, wParam, lParam);
+}
+
 static void DrawColoredButton(const DRAWITEMSTRUCT *drawItem, COLORREF fillColor,
                               COLORREF borderColor, COLORREF textColor, bool drawThemeIcon,
-                              bool darkModeEnabled) {
+                              bool drawHomeButton, bool darkModeEnabled) {
   HBRUSH fillBrush = CreateSolidBrush(fillColor);
   FillRect(drawItem->hDC, &drawItem->rcItem, fillBrush);
   DeleteObject(fillBrush);
@@ -563,6 +649,11 @@ static void DrawColoredButton(const DRAWITEMSTRUCT *drawItem, COLORREF fillColor
 
   if (drawThemeIcon) {
     DrawThemeToggleIcon(drawItem->hDC, drawItem->rcItem, darkModeEnabled);
+    return;
+  }
+
+  if (drawHomeButton) {
+    DrawHomeIcon(drawItem->hDC, drawItem->rcItem, darkModeEnabled);
     return;
   }
 
@@ -604,6 +695,10 @@ LRESULT CALLBACK QuizWindowMessageHandler(HWND windowHandle, UINT message, WPARA
     quizState->progressLabel = CreateWindow("STATIC", "", WS_VISIBLE | WS_CHILD | SS_LEFT, 0, 0,
                                             520, 28, windowHandle, NULL, NULL, NULL);
 
+    quizState->homeButton =
+        CreateWindowW(L"BUTTON", L"", WS_VISIBLE | WS_CHILD | BS_OWNERDRAW, 0, 0, 65, 38,
+                      windowHandle, (HMENU)(UINT_PTR)HOME_BUTTON_ID, GetModuleHandle(NULL), NULL);
+
     quizState->themeButton =
         CreateWindowW(L"BUTTON", L"", WS_VISIBLE | WS_CHILD | BS_OWNERDRAW, 0, 0, 65, 38,
                       windowHandle, (HMENU)(UINT_PTR)THEME_BUTTON_ID, GetModuleHandle(NULL), NULL);
@@ -618,9 +713,7 @@ LRESULT CALLBACK QuizWindowMessageHandler(HWND windowHandle, UINT message, WPARA
         CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER | ES_NUMBER, 0, 0, 130, 30,
                      windowHandle, NULL, NULL, NULL);
 
-    quizState->backButton =
-        CreateWindow("BUTTON", "Back", WS_VISIBLE | WS_CHILD | BS_OWNERDRAW, 0, 0, 120, 40,
-                     windowHandle, (HMENU)(UINT_PTR)BACK_BUTTON_ID, GetModuleHandle(NULL), NULL);
+    SetWindowSubclass(quizState->answerInputBox, AnswerEditSubclassProc, 1, 0);
 
     quizState->submitButton =
         CreateWindow("BUTTON", "Submit", WS_VISIBLE | WS_CHILD | BS_OWNERDRAW, 0, 0, 120, 40,
@@ -643,10 +736,10 @@ LRESULT CALLBACK QuizWindowMessageHandler(HWND windowHandle, UINT message, WPARA
 
     SendMessage(quizState->progressLabel, WM_SETFONT, (WPARAM)titleFont, TRUE);
 
-    HWND normalControls[] = {quizState->themeButton, quizState->questionLabel,
-                             quizState->answerLabel, quizState->answerInputBox,
-                             quizState->backButton,  quizState->submitButton,
-                             quizState->hintButton,  quizState->resultLabel};
+    HWND normalControls[] = {quizState->homeButton,     quizState->themeButton,
+                             quizState->questionLabel,  quizState->answerLabel,
+                             quizState->answerInputBox, quizState->submitButton,
+                             quizState->hintButton,     quizState->resultLabel};
 
     for (HWND control : normalControls) {
       SendMessage(control, WM_SETFONT, (WPARAM)normalFont, TRUE);
@@ -670,10 +763,24 @@ LRESULT CALLBACK QuizWindowMessageHandler(HWND windowHandle, UINT message, WPARA
       break;
 
     if (LOWORD(wParam) == SUBMIT_BUTTON_ID) {
+      char buffer[64] = {};
+      GetWindowText(quizState->answerInputBox, buffer, sizeof(buffer));
+
+      if (!quizState->waitingForNextClick && std::strlen(buffer) == 0) {
+        quizState->showError = true;
+        SetWindowText(quizState->resultLabel, "Input an answer before submitting");
+        InvalidateRect(windowHandle, NULL, TRUE);
+        UpdateWindow(windowHandle);
+        return 0;
+      }
+
+      quizState->showError = false;
       HandleSubmitButtonPressed(quizState);
+      InvalidateRect(windowHandle, NULL, TRUE);
+      UpdateWindow(windowHandle);
     }
 
-    if (LOWORD(wParam) == BACK_BUTTON_ID) {
+    if (LOWORD(wParam) == HOME_BUTTON_ID) {
       DestroyWindow(windowHandle);
     }
 
@@ -697,27 +804,27 @@ LRESULT CALLBACK QuizWindowMessageHandler(HWND windowHandle, UINT message, WPARA
     COLORREF textColor = GetTextColor(quizState->darkModeEnabled);
     COLORREF borderColor = quizState->darkModeEnabled ? RGB(140, 140, 140) : RGB(150, 150, 150);
 
-    if (drawItem->CtlID == BACK_BUTTON_ID) {
-      DrawColoredButton(drawItem, GetBackButtonColor(quizState->darkModeEnabled), borderColor,
-                        textColor, false, quizState->darkModeEnabled);
+    if (drawItem->CtlID == HOME_BUTTON_ID) {
+      DrawColoredButton(drawItem, GetPanelColor(quizState->darkModeEnabled), borderColor, textColor,
+                        false, true, quizState->darkModeEnabled);
       return TRUE;
     }
 
     if (drawItem->CtlID == SUBMIT_BUTTON_ID) {
       DrawColoredButton(drawItem, GetSubmitButtonColor(quizState->darkModeEnabled), borderColor,
-                        textColor, false, quizState->darkModeEnabled);
+                        textColor, false, false, quizState->darkModeEnabled);
       return TRUE;
     }
 
     if (drawItem->CtlID == HINT_BUTTON_ID) {
       DrawColoredButton(drawItem, GetHintButtonColor(quizState->darkModeEnabled), borderColor,
-                        textColor, false, quizState->darkModeEnabled);
+                        textColor, false, false, quizState->darkModeEnabled);
       return TRUE;
     }
 
     if (drawItem->CtlID == THEME_BUTTON_ID) {
       DrawColoredButton(drawItem, GetPanelColor(quizState->darkModeEnabled), borderColor, textColor,
-                        true, quizState->darkModeEnabled);
+                        true, false, quizState->darkModeEnabled);
       return TRUE;
     }
 
@@ -729,6 +836,13 @@ LRESULT CALLBACK QuizWindowMessageHandler(HWND windowHandle, UINT message, WPARA
       break;
 
     HDC deviceContext = reinterpret_cast<HDC>(wParam);
+
+    if ((HWND)lParam == quizState->resultLabel && quizState->showError) {
+      SetTextColor(deviceContext, RGB(255, 80, 80));
+      SetBkColor(deviceContext, GetBackgroundColor(quizState->darkModeEnabled));
+      return reinterpret_cast<INT_PTR>(quizState->backgroundBrush);
+    }
+
     SetTextColor(deviceContext, GetTextColor(quizState->darkModeEnabled));
     SetBkColor(deviceContext, GetBackgroundColor(quizState->darkModeEnabled));
     return reinterpret_cast<INT_PTR>(quizState->backgroundBrush);
@@ -792,8 +906,8 @@ void OpenQuizWindow(HWND parentWindow, int gradeLevel, const char *topic) {
     std::string noQuestionsMessage =
         "No " + std::string(topic) + " questions were found for Grade " +
         std::to_string(gradeLevel) +
-        ".\n\n"
-        "Please make sure the database has been seeded with questions for this subject and grade.";
+        ".\n\nPlease make sure the database has been seeded with questions for this subject and "
+        "grade.";
     MessageBox(parentWindow, noQuestionsMessage.c_str(), "No Questions Available",
                MB_OK | MB_ICONINFORMATION);
     return;
@@ -812,13 +926,14 @@ void OpenQuizWindow(HWND parentWindow, int gradeLevel, const char *topic) {
   quizState->sessionId = BuildUniqueSessionId(topic);
   quizState->waitingForNextClick = false;
   quizState->darkModeEnabled = IsDarkModeEnabled();
+  quizState->showError = false;
   quizState->correctAnswerForCurrentQuestion = 0;
   quizState->progressLabel = NULL;
   quizState->questionLabel = NULL;
   quizState->answerLabel = NULL;
   quizState->answerInputBox = NULL;
   quizState->submitButton = NULL;
-  quizState->backButton = NULL;
+  quizState->homeButton = NULL;
   quizState->hintButton = NULL;
   quizState->themeButton = NULL;
   quizState->resultLabel = NULL;
@@ -835,8 +950,8 @@ void OpenQuizWindow(HWND parentWindow, int gradeLevel, const char *topic) {
   RegisterClass(&quizWindowClass);
 
   HWND quizWindow =
-      CreateWindow("QuizWindowClass", windowTitle.c_str(), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
-                   CW_USEDEFAULT, 780, 570, parentWindow, NULL, GetModuleHandle(NULL), quizState);
+      CreateWindow("QuizWindowClass", windowTitle.c_str(), WS_OVERLAPPEDWINDOW, 120, 95, 900, 760,
+                   parentWindow, NULL, GetModuleHandle(NULL), quizState);
 
   ShowWindow(quizWindow, SW_SHOW);
   UpdateWindow(quizWindow);
