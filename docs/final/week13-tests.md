@@ -56,7 +56,7 @@ Assessment validation is now centralized, so this test confirms the new shared v
 Refactor coverage test
 
 ## CI Evidence
-- Passing CI Run: [PR LINK]
+- Passing CI evidence is shown on the merged Week 13 PR checks tab: https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/43
 
 ## PR Evidence
-- Test PR: [PR LINK]
+- Test PR: https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/43

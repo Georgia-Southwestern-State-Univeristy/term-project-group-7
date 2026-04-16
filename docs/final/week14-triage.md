@@ -15,7 +15,7 @@ This document prioritizes the issues that still threaten final release readiness
 - **Assigned Owner:** Ridhwaan
 - **Expected Disposition:** fix in Week 15
 - **Status This Week:** in progress
-- **Related PR:** PR LINK
+- **Related PR:** https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/46
 
 ## 2. README alignment with actual release candidate
 - **Priority:** Critical
@@ -24,7 +24,7 @@ This document prioritizes the issues that still threaten final release readiness
 - **Assigned Owner:** David
 - **Expected Disposition:** fix in Week 15
 - **Status This Week:** improved
-- **Related PR:** PR LINK
+- **Related PR:** https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/46
 
 ## 3. Runtime dependency on `questions.db`
 - **Priority:** Critical
@@ -33,7 +33,7 @@ This document prioritizes the issues that still threaten final release readiness
 - **Assigned Owner:** Grey
 - **Expected Disposition:** verify and document in Week 15
 - **Status This Week:** in progress
-- **Related PR:** PR LINK
+- **Related PR:** https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/46
 
 ## 4. Runtime dependency on copied `static/` assets
 - **Priority:** Important
@@ -42,7 +42,7 @@ This document prioritizes the issues that still threaten final release readiness
 - **Assigned Owner:** Ridhwaan
 - **Expected Disposition:** verify before final release
 - **Status This Week:** in progress
-- **Related PR:** PR LINK
+- **Related PR:** https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/46
 
 ## 5. Limited operator-facing diagnostics
 - **Priority:** Important
@@ -51,7 +51,7 @@ This document prioritizes the issues that still threaten final release readiness
 - **Assigned Owner:** David
 - **Expected Disposition:** improve before final release
 - **Status This Week:** in progress
-- **Related PR:** PR LINK
+- **Related PR:** https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/46
 
 ## 6. Windows-first execution path
 - **Priority:** Important
@@ -60,7 +60,7 @@ This document prioritizes the issues that still threaten final release readiness
 - **Assigned Owner:** Grey
 - **Expected Disposition:** document clearly; broader portability deferred
 - **Status This Week:** accepted constraint
-- **Related PR:** PR LINK
+- **Related PR:** https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/46
 
 ## 7. GUI/API documentation consistency
 - **Priority:** Important
@@ -69,7 +69,7 @@ This document prioritizes the issues that still threaten final release readiness
 - **Assigned Owner:** Ridhwaan
 - **Expected Disposition:** finalize before final release
 - **Status This Week:** in progress
-- **Related PR:** PR LINK
+- **Related PR:** https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/46
 
 ## 8. Reviewer startup friction
 - **Priority:** Important
@@ -78,7 +78,7 @@ This document prioritizes the issues that still threaten final release readiness
 - **Assigned Owner:** David
 - **Expected Disposition:** close in Week 15
 - **Status This Week:** improved
-- **Related PR:** PR LINK
+- **Related PR:** https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/46
 
 ## 9. Packaging and final presentation polish
 - **Priority:** Optional
@@ -87,14 +87,14 @@ This document prioritizes the issues that still threaten final release readiness
 - **Assigned Owner:** Grey
 - **Expected Disposition:** if time allows in Week 15 or Week 16
 - **Status This Week:** not started
-- **Related PR:** PR LINK
+- **Related PR:** https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/46
 
 ## Issues Closed This Week
 List issues or cleanup items that were completed this week and link the PRs.
 
-- Closed item 1: NEED DESCRIPTION — PR LINK
-- Closed item 2: NEED DESCRIPTION — PR LINK
-- Closed item 3: NEED DESCRIPTION — PR LINK
+- Closed item 1: Added the Week 14 release candidate summary and formal release evidence package — https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/46
+- Closed item 2: Added the verified runbook, user guide, and admin guide for reviewer and maintainer use — https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/46
+- Closed item 3: Added interface documentation, repo alignment updates, and README reviewer-path cleanup — https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/46
 
 ## Final Note
 This triage list is intended to support final release decision-making under time pressure. It is not a backlog dump. Remaining items here are the highest-value issues affecting final release confidence.

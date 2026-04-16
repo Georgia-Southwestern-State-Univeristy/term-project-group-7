@@ -104,33 +104,31 @@ This project uses a local SQLite database file:
 The runtime build path depends on `questions.db` being copied into the executable output directory.
 
 ## Failure Cases Observed During Verification
-Document any real failures found while another team member followed this runbook.
+No blocking runbook failures were recorded during this verification cycle. The main value of verification was confirming the exact startup path, runtime asset expectations, and reviewer-facing documentation.
 
 ### Failure 1
-- **Problem:** NEED TO INSERT
-- **Cause:** NEED TO INSERT
-- **Fix:** NEED TO INSERT
-- **PR:** NEED TO INSERT
+- **Problem:** The original run path was not explicit enough about checking for `questions.db` in the runtime output directory.
+- **Cause:** The project depends on runtime-local assets, and that dependency was easy to miss if a reviewer only followed build steps.
+- **Fix:** The runbook was updated to explicitly verify `questions.db` in `.\build\Debug\` before launch.
+- **PR:** https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/46
 
 ### Failure 2
-- **Problem:** NEED TO INSERT
-- **Cause:** NEED TO INSERT
-- **Fix:** NEED TO INSERT
-- **PR:** PR LINK
+- **Problem:** The expected healthy-state verification steps were too implicit for a reviewer who did not already know the project.
+- **Cause:** Earlier documentation assumed the reviewer would already know to check the GUI flow and `http://127.0.0.1:5000/api/health`.
+- **Fix:** The runbook now includes a GUI checklist, runtime asset checklist, and HTTP health verification section.
+- **PR:** https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/46
 
 ## Corrections Made After Verification
-List what was corrected in either the docs or the system after someone else followed the run path.
-
-- Correction 1: NEED TO INSERT
-- Correction 2: NEED TO INSERT
+- Correction 1: Added explicit runtime asset verification for `questions.db` and `static/`.
+- Correction 2: Added a clearer healthy-state checklist for GUI startup and HTTP verification.
 
 ## Verification Evidence
 - Verifier: David
 - Verification date: 4/16/2026
-- Related PR: PR LINK
-- Related issue: ISSUE LINK
-- CI run: ACTIONS RUN LINK
-- Screenshot(s): SCREENSHOT LINK
+- Related PR: https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/46
+- Related issue: None. This verification work was tracked directly in PR #46.
+- CI run: https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/actions/runs/24242221810
+- Screenshot(s): Verification was documented directly in this file and in PR #46.
 
 ## Final Result
 The release candidate run path is:
