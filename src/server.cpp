@@ -5,14 +5,17 @@
 #include <optional>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <vector>
 
-#include "httplib.h"
-#include "menu/menu.h"
+#define WIN32_LEAN_AND_MEAN
+#include <winsock2.h>
+#include <ws2tcpip.h>
 
+#include "gui/main_menu_gui.h"
+#include "httplib.h"
 #include "in_memory_store.h"
 #include "mvp_service.h"
-#include <cctype>
 
 static const char *INDEX_HTML = R"HTML(
 <!DOCTYPE html>
@@ -29,37 +32,43 @@ static const char *INDEX_HTML = R"HTML(
 )HTML";
 
 static std::optional<std::string> json_get_string(const std::string &body, const std::string &key) {
-  // Very small parser: expects "key":"value"
   const std::string pat = "\"" + key + "\"";
   auto kpos = body.find(pat);
   if (kpos == std::string::npos)
     return std::nullopt;
+
   auto colon = body.find(":", kpos);
   if (colon == std::string::npos)
     return std::nullopt;
+
   auto q1 = body.find("\"", colon);
   if (q1 == std::string::npos)
     return std::nullopt;
+
   auto q2 = body.find("\"", q1 + 1);
   if (q2 == std::string::npos)
     return std::nullopt;
+
   return body.substr(q1 + 1, q2 - (q1 + 1));
 }
 
 static std::optional<int> json_get_int(const std::string &body, const std::string &key) {
-  // Expects "key": 123
   const std::string pat = "\"" + key + "\"";
   auto kpos = body.find(pat);
   if (kpos == std::string::npos)
     return std::nullopt;
+
   auto colon = body.find(":", kpos);
   if (colon == std::string::npos)
     return std::nullopt;
+
   auto start = body.find_first_of("-0123456789", colon);
   if (start == std::string::npos)
     return std::nullopt;
+
   auto end = body.find_first_not_of("0123456789", start);
   auto num = body.substr(start, end - start);
+
   try {
     return std::stoi(num);
   } catch (...) {
@@ -81,6 +90,7 @@ struct LogField {
 static std::string json_escape(const std::string &s) {
   std::string out;
   out.reserve(s.size() + 8);
+
   for (char c : s) {
     switch (c) {
     case '\\':
@@ -103,30 +113,36 @@ static std::string json_escape(const std::string &s) {
       break;
     }
   }
+
   return out;
 }
 
 static std::string now_iso8601() {
   using namespace std::chrono;
+
   auto now = system_clock::now();
   auto t = system_clock::to_time_t(now);
   std::tm tm{};
+
 #ifdef _WIN32
   gmtime_s(&tm, &t);
 #else
   gmtime_r(&t, &tm);
 #endif
+
   std::ostringstream oss;
   oss << std::put_time(&tm, "%Y-%m-%dT%H:%M:%SZ");
   return oss.str();
 }
 
 static std::string new_request_id() {
-  static std::atomic<uint64_t> counter{0};
+  static std::atomic<unsigned long long> counter{0};
+
   using namespace std::chrono;
   auto now = system_clock::now();
   auto ms = duration_cast<milliseconds>(now.time_since_epoch()).count();
-  return "req-" + std::to_string(ms) + "-" + std::to_string(counter++);
+
+  return "req-" + std::to_string(ms) + "-" + std::to_string(counter.fetch_add(1));
 }
 
 static std::string ensure_request_id(const httplib::Request &req, httplib::Response &res) {
@@ -135,6 +151,7 @@ static std::string ensure_request_id(const httplib::Request &req, httplib::Respo
     res.set_header("X-Request-Id", incoming);
     return incoming;
   }
+
   auto id = new_request_id();
   res.set_header("X-Request-Id", id);
   return id;
@@ -147,6 +164,7 @@ static void log_json(std::ostream &out, const std::string &level, const std::str
   oss << "\"ts\":\"" << json_escape(now_iso8601()) << "\",";
   oss << "\"level\":\"" << json_escape(level) << "\",";
   oss << "\"event\":\"" << json_escape(event) << "\"";
+
   for (const auto &f : fields) {
     oss << ",\"" << json_escape(f.key) << "\":";
     if (f.quote) {
@@ -155,13 +173,12 @@ static void log_json(std::ostream &out, const std::string &level, const std::str
       oss << f.value;
     }
   }
+
   oss << "}";
   out << oss.str() << "\n";
 }
 
 int main() {
-  runMainMenu();
-
   httplib::Server server;
 
   InMemoryStore store;
@@ -199,6 +216,7 @@ int main() {
 
   server.Post("/api/students", [&](const httplib::Request &req, httplib::Response &res) {
     const auto requestId = ensure_request_id(req, res);
+
     if (req.body.empty()) {
       log_json(std::cerr, "error", "validation_error",
                {
@@ -209,8 +227,10 @@ int main() {
                });
       return json_error(res, 400, "request body is required");
     }
+
     auto name = json_get_string(req.body, "name");
     auto grade = json_get_int(req.body, "gradeLevel");
+
     if (!name.has_value() || !grade.has_value()) {
       log_json(std::cerr, "error", "validation_error",
                {
@@ -224,6 +244,7 @@ int main() {
 
     std::string err;
     auto s = svc.create_student(*name, *grade, err);
+
     if (!s.has_value()) {
       log_json(std::cerr, "error", "domain_error",
                {
@@ -240,6 +261,7 @@ int main() {
     res.set_content(std::string("{\"studentId\":\"") + s->studentId + "\",\"name\":\"" + s->name +
                         "\",\"gradeLevel\":" + std::to_string(s->gradeLevel) + "}",
                     "application/json; charset=utf-8");
+
     log_json(std::cout, "info", "create_student",
              {
                  {"request_id", requestId},
@@ -253,6 +275,7 @@ int main() {
               [&](const httplib::Request &req, httplib::Response &res) {
                 const std::string studentId = req.matches[1];
                 const auto requestId = ensure_request_id(req, res);
+
                 if (req.body.empty()) {
                   log_json(std::cerr, "error", "validation_error",
                            {
@@ -267,6 +290,7 @@ int main() {
 
                 auto skill = json_get_string(req.body, "skill");
                 auto score = json_get_int(req.body, "score");
+
                 if (!skill.has_value() || !score.has_value()) {
                   log_json(std::cerr, "error", "validation_error",
                            {
@@ -281,7 +305,9 @@ int main() {
 
                 std::string err;
                 auto a = svc.add_assessment_and_recommend(studentId, *skill, *score, err);
+
                 if (!a.has_value()) {
+                  const int code = (err == "student not found") ? 404 : 400;
                   log_json(std::cerr, "error", "domain_error",
                            {
                                {"request_id", requestId},
@@ -291,9 +317,7 @@ int main() {
                                {"score", std::to_string(score.value_or(-1)), false},
                                {"reason", err},
                            });
-                  if (err == "student not found")
-                    return json_error(res, 404, err);
-                  return json_error(res, 400, err);
+                  return json_error(res, code, err);
                 }
 
                 res.status = 201;
@@ -301,11 +325,12 @@ int main() {
                                     "\",\"studentId\":\"" + a->studentId + "\",\"skill\":\"" +
                                     a->skill + "\",\"score\":" + std::to_string(a->score) + "}",
                                 "application/json; charset=utf-8");
+
                 log_json(std::cout, "info", "add_assessment",
                          {
                              {"request_id", requestId},
-                             {"assessmentId", a->assessmentId},
                              {"studentId", a->studentId},
+                             {"assessmentId", a->assessmentId},
                              {"skill", a->skill},
                              {"score", std::to_string(a->score), false},
                          });
@@ -318,11 +343,12 @@ int main() {
 
                std::string err;
                auto rec = svc.latest_recommendation(studentId, err);
+
                if (!rec.has_value()) {
                  log_json(std::cerr, "error", "domain_error",
                           {
                               {"request_id", requestId},
-                              {"action", "get_latest_recommendation"},
+                              {"action", "latest_recommendation"},
                               {"studentId", studentId},
                               {"reason", err},
                           });
@@ -335,7 +361,8 @@ int main() {
                                    rec->activityId + "\",\"reason\":\"" + rec->reason +
                                    "\",\"source\":\"" + rec->source + "\"}",
                                "application/json; charset=utf-8");
-               log_json(std::cout, "info", "get_latest_recommendation",
+
+               log_json(std::cout, "info", "latest_recommendation",
                         {
                             {"request_id", requestId},
                             {"studentId", rec->studentId},
@@ -349,6 +376,7 @@ int main() {
               [&](const httplib::Request &req, httplib::Response &res) {
                 const std::string studentId = req.matches[1];
                 const auto requestId = ensure_request_id(req, res);
+
                 if (req.body.empty()) {
                   log_json(std::cerr, "error", "validation_error",
                            {
@@ -363,6 +391,7 @@ int main() {
 
                 auto activityId = json_get_string(req.body, "activityId");
                 auto reason = json_get_string(req.body, "reason");
+
                 if (!activityId.has_value() || !reason.has_value()) {
                   log_json(std::cerr, "error", "validation_error",
                            {
@@ -377,6 +406,7 @@ int main() {
 
                 std::string err;
                 auto rec = svc.teacher_override(studentId, *activityId, *reason, err);
+
                 if (!rec.has_value()) {
                   log_json(std::cerr, "error", "domain_error",
                            {
@@ -384,6 +414,7 @@ int main() {
                                {"action", "teacher_override"},
                                {"studentId", studentId},
                                {"activityId", activityId.value_or("-")},
+                               {"reason_text", reason.value_or("-")},
                                {"reason", err},
                            });
                   return json_error(res, 404, err);
@@ -395,17 +426,27 @@ int main() {
                                     "\",\"activityId\":\"" + rec->activityId + "\",\"reason\":\"" +
                                     rec->reason + "\",\"source\":\"" + rec->source + "\"}",
                                 "application/json; charset=utf-8");
+
                 log_json(std::cout, "info", "teacher_override",
                          {
                              {"request_id", requestId},
                              {"studentId", rec->studentId},
-                             {"recommendationId", rec->recommendationId},
                              {"activityId", rec->activityId},
+                             {"source", rec->source},
                          });
               });
 
-  std::cout << "Running on http://127.0.0.1:5000\n";
+  std::thread serverThread([&server]() {
+    std::cout << "Running on http://127.0.0.1:5000\n";
+    server.listen("127.0.0.1", 5000);
+  });
 
-  server.listen("127.0.0.1", 5000);
+  OpenMainMenuWindow();
+
+  server.stop();
+  if (serverThread.joinable()) {
+    serverThread.join();
+  }
+
   return 0;
 }
