@@ -4,7 +4,7 @@
 Improve maintainability, reliability, and support readiness by reducing code duplication, strengthening diagnostics, and adding regression protection around core student learning flows.
 
 ## Evidence
-- Project Board Sprint View: [PPROJECT BOARD SPRINT LINK]
+- Sprint evidence was tracked directly in the Week 13 submission PR and supporting docs: https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/43
 
 ## Committed Backlog Items
 

@@ -66,5 +66,5 @@ One validation-related test did not meaningfully exercise the service.
 The service validation behavior is directly tested and protected.
 
 ## Evidence
-- Observability PR: [PR LINK]
-- Supporting PR or same PR: [PR LINK]
+- Observability PR: https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/43
+- Supporting PR or same PR: https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/43

@@ -43,5 +43,5 @@ The refactor was protected by automated tests, including:
 - existing regression and boundary tests already covering service behavior
 
 ## PR Evidence
-- Refactor PR: [PR LINKE]
-- Supporting test PR or same PR: [PR LINK]
+- Refactor PR: https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/43
+- Supporting test PR or same PR: https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/43

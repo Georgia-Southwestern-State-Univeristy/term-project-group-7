@@ -56,9 +56,10 @@ Compared to the beta stage, this release candidate improves:
 
 ## Release Artifact
 - Git tag: `rc-v0.9`
-- GitHub release page: RELEASE LINK
-- Related PR: PR LINK
-- CI run for release candidate: ACTIONS RUN LINK
+- GitHub tag page: https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/tree/rc-v0.9
+- GitHub release page: https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/releases/tag/rc-v0.9
+- Related PR: https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/46
+- CI run for release candidate: https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/actions/runs/24242221810
 
 ## Evidence
 - Runbook verification results are documented in `docs/final/week14-runbook.md`

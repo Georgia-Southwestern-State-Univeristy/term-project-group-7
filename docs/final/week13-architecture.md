@@ -59,4 +59,4 @@ Browser
 → HTTP Response
 
 ## Evidence
-- Architecture PR: [PR LINK]
+- Architecture PR: https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/43
