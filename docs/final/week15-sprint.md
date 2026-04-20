@@ -69,4 +69,4 @@ This backlog is intentionally small and closure-focused. The team is not treatin
 
 ## Evidence
 - Project Board sprint view: ADD PROJECT BOARD LINK HERE
-- Related PR: WEEK 15 PR LINK
+- Related PR: https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/48

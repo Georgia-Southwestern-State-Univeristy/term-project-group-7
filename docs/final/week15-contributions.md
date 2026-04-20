@@ -23,7 +23,7 @@ DevOps / QA
 - Week 15 contribution/accountability documentation
 - Related PRs:
   - https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/46
-  - WEEK 15 PR LINK
+  - https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/48
 
 ### Final Presentation Responsibility
 - explain final QA confidence
@@ -52,7 +52,7 @@ Project Manager / Scrum Lead / Documentation Lead
 - Week 15 hand-off completion status
 - Related PRs:
   - https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/46
-  - WEEK 15 PR LINK
+  - https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/48
 
 ### Final Presentation Responsibility
 - present project overview and final scope
@@ -79,7 +79,7 @@ Backend / API Lead / Frontend
 - Week 15 documentation consistency cleanup
 - Related PRs:
   - https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/46
-  - WEEK 15 PR LINK
+  - https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/48
 
 ### Final Presentation Responsibility
 - explain architecture and technical design decisions

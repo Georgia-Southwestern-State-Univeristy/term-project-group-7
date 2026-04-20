@@ -38,4 +38,4 @@ The hand-off is now substantially complete and usable. Remaining work is minor c
 
 ## Evidence
 - Updated hand-off doc: `docs/handoff/hand-off-draft.md`
-- Week 15 PR: ADD WEEK 15 PR LINK HERE
+- Week 15 PR: https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/48

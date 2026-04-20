@@ -150,7 +150,7 @@ If the demo partially fails:
 * QA Document: `docs/final/week15-qa.md`
 * Handoff Status: `docs/final/week15-handoff-status.md`
 * Contributions: `docs/final/week15-contributions.md`
-* PR: WEEK 15 PR LINK
+* PR: https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/48
 
 ---
 

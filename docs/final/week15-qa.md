@@ -120,7 +120,7 @@ ctest --test-dir build -C Debug --output-on-failure
 ## High Priority Fixes / PRs
 
 * Week 14 PR: https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/46
-* Week 15 PR: WEEK 15 PR LINK
+* Week 15 PR: https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/48
 
 ---
 
@@ -139,4 +139,4 @@ The project is final-ready if:
 
 * Verified by: Victor Grey
 * Date: 04/20/2026
-* PR: WEEK 15 PR LINK
+* PR: https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/48
