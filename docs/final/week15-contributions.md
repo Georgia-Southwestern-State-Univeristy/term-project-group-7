@@ -1,7 +1,7 @@
 # Week 15 Individual Contribution Snapshot
 
 ## Purpose
-This document makes individual contributions visible before final presentation and final review. The goal is to show concrete work, not generic praise.
+This document makes individual contributions visible before final presentation and final review. The goal is to show concrete work.
 
 ---
 
