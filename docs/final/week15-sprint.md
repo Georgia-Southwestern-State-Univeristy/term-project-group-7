@@ -80,6 +80,6 @@ This sprint is not a feature-growth sprint. It exists to reduce final presentati
 This backlog is intentionally closure-focused. Week 15 work is about final verification, demo confidence, documentation integrity, and reviewer clarity. If this backlog still reads like future feature planning, the team is off target.
 
 ## Evidence
-- Project Board sprint view: ADD FINAL PROJECT BOARD SPRINT VIEW LINK HERE
+- Project Board sprint view: (https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/projects)
 - Related PR (Week 14): https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/46
 - Related PR (Week 15): https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7/pull/48
