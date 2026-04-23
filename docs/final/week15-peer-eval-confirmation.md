@@ -15,4 +15,4 @@ The team confirms that all listed members completed the instructor-provided peer
 04/26/2026
 
 ## Note
-This repository confirmation file does not include any private peer evaluation responses. Only completion status is recorded here.
+This repository file records completion status only. It does not include any private peer-evaluation responses, scores, or comments.
