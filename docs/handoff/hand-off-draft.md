@@ -1,171 +1,192 @@
-# Hand-Off Document (Near-Final Draft)
-
-## Purpose
-This document is intended to help a reviewer, teammate, or future maintainer understand what the project is, how to run it, what to expect from it, what its current limits are, and what should happen next if development continues.
-
----
+# Project Hand-Off Document
 
 ## System Overview
-This project is a semester-scale adaptive learning platform prototype focused on a thin vertical slice for middle-school math. The team prioritized a buildable, runnable, and reviewable prototype over full production scope.
 
-The current project demonstrates:
-- a Windows desktop application built in C++
-- a local runtime model that depends on packaged assets
-- SQLite-backed question/runtime data
-- a lightweight local HTTP health endpoint
-- automated build/test support through CMake, CTest, and CI
-- repo documentation intended to support review, setup, and hand-off
+The Adaptive Learning Platform is a backend-focused system designed to evaluate student performance and generate learning recommendations using a rules-based adaptive engine. The system exposes REST API endpoints that simulate student workflows such as account creation, assessment submission, and recommendation retrieval.
+
+This project is intended as a functional prototype demonstrating architecture, adaptive logic, CI/CD integration, and testing practices.
 
 ---
 
 ## Architecture Snapshot
 
-### Main Interfaces
-1. Windows GUI
-2. Local HTTP API / health endpoint
+The system follows a lightweight modular backend architecture:
 
-### Core Runtime Flow
-User interaction in the GUI leads into question flow, answer evaluation, feedback behavior, and analytics visibility.
+* **Backend:** C++17 HTTP server (cpp-httplib)
+* **API Layer:** REST endpoints for student workflows
+* **Adaptive Engine:** Rules-based logic for recommendations
+* **Database:** SQLite for persistence
+* **Build System:** CMake
+* **Testing:** CTest
+* **CI/CD:** GitHub Actions
 
-High-level flow:
-User → GUI → Question / Evaluation Flow → Feedback / Hinting → Analytics
+### Data Flow
 
-### Current Scope Note
-This is a semester prototype. The GUI and local HTTP API coexist in the repo, but they are not presented as a single fully unified production application stack.
+1. Student is created via API
+2. Assessment is submitted
+3. System evaluates score
+4. Adaptive logic determines learning path
+5. Recommendation is returned
 
 ---
 
-## Stack Rationale
-The project emphasizes a Windows-first, C++-based implementation that the team could build, explain, test, and hand off within the semester.
+## Tech Stack and Rationale
 
-Key choices:
-- **C++17:** aligned with the team’s final implementation direction
-- **Win32 GUI:** provided a direct desktop interface for the math workflow
-- **SQLite:** lightweight local data/runtime support
-- **cpp-httplib:** simple local HTTP support for health verification
-- **CMake + CTest:** consistent build and test workflow
-- **GitHub Actions:** CI evidence for build/test automation
+### C++
 
-The technical choices favor feasibility, transparency, and reviewability over production-scale complexity.
+Chosen for performance, control, and demonstrating lower-level system design.
+
+### SQLite
+
+Lightweight, file-based database suitable for local prototype development.
+
+### CMake + CTest
+
+Provides a standardized build and testing workflow.
+
+### GitHub Actions
+
+Ensures automated validation of build and test processes.
+
+### Rules-Based Logic
+
+Selected for simplicity and explainability instead of machine learning.
 
 ---
 
 ## Repository Structure
 
-### Main Areas
-- `src/` - main source implementation
-- `src/gui/` - GUI-related implementation
-- `database/` - database-related assets/support
-- `docs/` - reviewer-facing project documentation
-- `.github/workflows/` - CI configuration
-
-### Important Reviewer-Facing Documents
-- `README.md`
-- `docs/final/week15-qa.md`
-- `docs/final/week15-presentation-plan.md`
-- `docs/final/week15-handoff-status.md`
-- `docs/user-guide.md`
-- `docs/admin-guide.md`
-- `docs/api/interface-overview.md`
+```plaintext
+src/                → Core application logic (server.cpp)
+include/            → Header files
+tests/              → Unit tests
+docs/               → Documentation and deliverables
+build/              → Generated build files
+.github/workflows/  → CI pipeline configuration
+```
 
 ---
 
-## Setup / Build / Test / Run Summary
+## Setup and Run Instructions
 
-### Clone
+### Prerequisites
+
+* C++17 compatible compiler
+* CMake
+* Git
+
+### Build Steps
+
 ```bash
-git clone https://github.com/Georgia-Southwestern-State-Univeristy/term-project-group-7.git
+git clone <repo-url>
 cd term-project-group-7
+
+mkdir build
+cd build
+cmake ..
+cmake --build .
+ctest
 ```
 
-### Configure
-```powershell
-cmake -S . -B build
-```
+### Run the Server
 
-### Build
-```powershell
-cmake --build build --config Debug
-```
-
-### Test
-```powershell
-ctest --test-dir build -C Debug --output-on-failure
-```
-
-### Run
-```powershell
-.\build\Debug\server.exe
+```bash
+./server
 ```
 
 ---
 
-## Runtime Requirements
-Before running the main executable, verify that the expected runtime files are present in:
+## API Usage (Core Workflow)
 
-`.\build\Debug\`
+### 1. Create Student
 
-Expected runtime items include:
-- `server.exe`
-- `questions.db`
-- `static/`
+POST `/api/students`
 
-If required runtime assets are missing, startup or runtime behavior may fail or become incomplete.
+### 2. Submit Assessment
 
----
+POST `/api/students/{studentId}/assessments`
 
-## Verification / Health Check
-Local health endpoint:
+### 3. Retrieve Recommendation
 
-`http://127.0.0.1:5000/api/health`
-
-Expected response:
-```json
-{"status":"ok","service":"cpp"}
-```
-
-This endpoint is useful as a simple technical verification point, but it should not be treated as proof that every GUI/runtime path is fully production-ready.
+GET `/api/students/{studentId}/recommendations/latest`
 
 ---
 
 ## Known Issues and Constraints
 
-### Known Issues
-- the primary execution path is Windows-first
-- runtime success depends on local assets being present in the correct build output location
-- the project does not provide a polished production deployment experience
-- GUI flow and local API presence are not yet a fully unified end-user platform
+* No authentication or user management system
+* Limited scalability (local-only deployment)
+* Rule-based recommendations (no ML personalization)
+* Minimal frontend/UI support
+* Limited performance testing
 
-### Constraints
-- this was developed as a semester prototype with limited time and scope
-- the team intentionally prioritized a thin vertical slice over broad feature completeness
-- reviewer success depends on following the documented setup/run steps
-- some final evidence references may still require last-pass replacement before submission
+---
+
+## Testing and CI Evidence
+
+* Unit tests implemented using CTest
+* CI pipeline validates:
+
+  * Successful build
+  * Test execution
+  * Code formatting checks
+
+All CI runs are available via GitHub Actions.
+
+---
+
+## Maintenance Notes
+
+* Follow existing directory structure when adding features
+* Maintain CMake configuration for builds
+* Keep tests updated with new functionality
+* Ensure CI pipeline remains passing before merging changes
+* Use consistent formatting (clang-format)
 
 ---
 
 ## Recommended Next Steps
-If development continued beyond the current semester scope, the highest-value next steps would be:
 
-1. reduce runtime setup friction and improve packaging/deployment
-2. improve asset handling so required files are less manual
-3. strengthen error handling and user-facing failure feedback
-4. unify the system more clearly across GUI and service behavior
-5. expand testing around real runtime and workflow scenarios
-6. improve long-term maintainability and deployment documentation
+### High Priority
 
----
+1. Implement authentication and user roles
+2. Expand adaptive logic (introduce ML-based recommendations)
 
-## User / Admin / Interface Guidance References
-Reviewers should use the following docs for additional guidance:
-- `README.md`
-- `docs/user-guide.md`
-- `docs/admin-guide.md`
-- `docs/api/interface-overview.md`
+### Medium Priority
 
-These documents provide the main reviewer path for setup, usage, and interface understanding.
+3. Develop frontend interface
+4. Improve API validation and error handling
+
+### Long Term
+
+5. Deploy system to cloud (AWS/Azure)
+6. Add performance and load testing
+7. Improve scalability and database design
 
 ---
 
-## Final Assessment
-This project should be understood as a working academic prototype: buildable, testable, reviewable, and presentable, but not production-complete. Its strongest value is that it demonstrates a real, explainable vertical slice with documented setup, visible runtime behavior, and an honest statement of limits.
+## Key File Locations
+
+* `src/server.cpp` → Main application entry point
+* `include/` → Header definitions
+* `tests/` → Unit testing files
+* `docs/` → All documentation
+* `.github/workflows/` → CI pipeline
+
+---
+
+## Example End-to-End Workflow
+
+1. Send POST request to create a student
+2. Submit assessment data for that student
+3. System processes score and determines proficiency
+4. Adaptive logic generates recommendation
+5. Retrieve recommendation via API
+
+---
+
+## Final Notes
+
+This system is stable and functional as a backend prototype. It demonstrates solid software engineering practices including modular design, CI/CD integration, and structured documentation.
+
+The project is not fully production-ready but provides a strong foundation for continued development by future teams.
