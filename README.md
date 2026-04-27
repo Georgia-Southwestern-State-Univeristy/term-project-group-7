@@ -62,7 +62,7 @@ This repository is primarily set up for the Windows build path. The main release
     - `week14-triage.md`
     - `week14-repo-polish.md`
   - `releases/`
-    - `release-candidate.md`
+    - `final-release.md`
   - `admin-guide.md`
   - `user-guide.md`
 - `include/`
@@ -108,7 +108,7 @@ Detailed startup and verification steps are documented in `docs/final/week14-run
 
 ## Where a Reviewer Should Start
 1. `README.md`
-2. `docs/releases/release-candidate.md`
+2. `docs/releases/final-release.md`
 3. `docs/final/week14-runbook.md`
 4. `docs/user-guide.md`
 5. `docs/admin-guide.md`
@@ -117,7 +117,7 @@ Detailed startup and verification steps are documented in `docs/final/week14-run
 8. `tests/`
 
 ## Key Documentation
-- Release candidate summary: `docs/releases/release-candidate.md`
+- Release candidate summary: `docs/releases/final-release.md`
 - Runbook verification: `docs/final/week14-runbook.md`
 - User guide: `docs/user-guide.md`
 - Admin / maintenance guide: `docs/admin-guide.md`
@@ -134,6 +134,6 @@ Detailed startup and verification steps are documented in `docs/final/week14-run
 - Operational diagnostics are local and lightweight rather than production-grade
 
 ## Release Status
-This repository is being prepared as a formal release candidate prior to final release.
+This repository represents the final release submission for the project.
 
-See `docs/releases/release-candidate.md` for the current release summary, known risks, and remaining work.
+See `docs/releases/final-release.md` for the current release summary, known risks, and remaining work.
